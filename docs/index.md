@@ -20,7 +20,7 @@ Welcome to the **Fairground Control Panel API**! This is a BepInEx / IL2CPP mod 
 
 _Note: You must have [BepInEx 6 Bleeding Edge (IL2CPP version)](https://builds.bepinex.dev/projects/bepinex_be) installed in your game directory. Read the [Installation Guide](https://docs.bepinex.dev/master/articles/user_guide/installation/unity_il2cpp.html) if you need help._
 
-1. Go to the Releases page and download the latest `.zip` file.
+1. Go to the [Releases page](https://github.com/lucarab/FairgroundAPI/releases) and download the latest `.zip` file.
 2. Extract **both** `FairgroundAPI.dll` and `websocket-sharp.dll` into your `BepInEx/plugins/` folder.
 3. Keep the `web` folder anywhere on your PC (or host it locally).
 4. Launch the game, walk up to a ride, take control, and then simply double-click `web/index.html` to open your control panel!
