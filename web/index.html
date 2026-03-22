@@ -1,0 +1,1402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fairground API Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0f19;
+            --bg-secondary: #111827;
+            --bg-card: #151c2c;
+            --bg-card-hover: #1a2235;
+            --bg-input: #0d1221;
+            --border-color: rgba(56, 72, 100, 0.5);
+            --border-active: rgba(59, 130, 246, 0.5);
+            --text-primary: #e2e8f0;
+            --text-secondary: #7a8ba8;
+            --text-muted: #4a5568;
+            --accent-blue: #3b82f6;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-yellow: #eab308;
+            --accent-orange: #f97316;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --tab-active: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top center, #111827 0%, #0b0f19 100%);
+            background-attachment: fixed;
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ── Global Scrollbar ────────────────────────── */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: rgba(56, 72, 100, 0.5); border-radius: 4px; border: 2px solid var(--bg-primary); }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(75, 85, 99, 0.8); }
+
+        /* ── Header ──────────────────────────────────── */
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            background: #0e1525;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .header-title span {
+            color: var(--accent-blue);
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.connected {
+            background: rgba(34, 197, 94, 0.12);
+            color: var(--accent-green);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+        }
+
+        .status-badge.disconnected {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+
+        .status-badge.connected .status-dot {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+            50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+        }
+
+        /* ── Connection Bar ──────────────────────────── */
+        .connection-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 24px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .connection-bar label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+
+        .connection-bar input {
+            flex: 1;
+            max-width: 300px;
+            padding: 7px 12px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .connection-bar input:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .btn-reconnect {
+            padding: 7px 18px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            border-radius: 6px;
+            color: var(--accent-blue);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-reconnect:hover {
+            background: rgba(59, 130, 246, 0.25);
+        }
+
+        /* ── Main Layout ─────────────────────────────── */
+        .main {
+            padding: 20px 24px;
+        }
+
+        /* ── Lights Section ───────────────────────────── */
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+        }
+
+        .section-count {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .lamp-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            gap: 10px;
+            margin-bottom: 28px;
+        }
+
+        .lamp-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .lamp-card:hover {
+            border-color: rgba(75, 85, 99, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .lamp-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .lamp-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lamp-state {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .lamp-dot {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .lamp-dot.off { background: #374151; }
+        .lamp-dot.green { background: var(--accent-green); box-shadow: 0 0 12px rgba(34,197,94,0.5); }
+        .lamp-dot.red { background: var(--accent-red); box-shadow: 0 0 12px rgba(239,68,68,0.5); }
+        .lamp-dot.yellow { background: var(--accent-yellow); box-shadow: 0 0 12px rgba(234,179,8,0.5); }
+        .lamp-dot.blue { background: var(--accent-blue); box-shadow: 0 0 12px rgba(59,130,246,0.5); }
+        .lamp-dot.orange { background: var(--accent-orange); box-shadow: 0 0 12px rgba(249,115,22,0.5); }
+        .lamp-dot.purple { background: var(--accent-purple); box-shadow: 0 0 12px rgba(168,85,247,0.5); }
+        .lamp-dot.white { background: #e5e7eb; box-shadow: 0 0 12px rgba(229,231,235,0.4); }
+
+        /* Strobe = normal speed */
+        .lamp-dot.strobe { animation: blink 1s infinite; }
+        /* Strobe_Fast */
+        .lamp-dot.strobe-fast { animation: blink 0.75s infinite; }
+        /* Strobe_Slow */
+        .lamp-dot.strobe-slow { animation: blink 1.5s infinite; }
+
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.08} }
+
+        /* ── Tabs ─────────────────────────────────────── */
+        .tabs-container {
+            margin-bottom: 28px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 0;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover { color: var(--text-secondary); }
+
+        .tab-btn.active {
+            color: var(--accent-blue);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-blue);
+        }
+
+        .tab-btn .tab-count {
+            display: inline-block;
+            margin-left: 6px;
+            padding: 1px 7px;
+            border-radius: 10px;
+            background: rgba(75, 85, 99, 0.3);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .tab-btn.active .tab-count {
+            background: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .tab-content {
+            display: none;
+            border: 1px dashed var(--border-color);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            padding: 16px;
+            min-height: 120px;
+        }
+
+        .tab-content.active { display: block; }
+
+        .tab-content .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+            padding: 30px 0;
+        }
+
+        /* ── Control Cards (Buttons, Switches, Pots) ── */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+        }
+
+        .control-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .control-card:hover {
+            border-color: rgba(75, 85, 99, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        .control-card .ctrl-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .control-card .ctrl-meta {
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        /* Button controls */
+        .btn-press {
+            padding: 8px 20px;
+            border-radius: 6px;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.1s;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 rgba(34, 197, 94, 0.3);
+            margin-bottom: 4px; /* Space for the shadow */
+        }
+
+        .btn-press:hover { 
+            background: rgba(34,197,94,0.15); 
+            box-shadow: 0 4px 0 rgba(34, 197, 94, 0.4); 
+        }
+        
+        .btn-press:active, .btn-press.active { 
+            transform: translateY(4px); 
+            box-shadow: 0 0 0 rgba(34, 197, 94, 0); 
+            background: rgba(34,197,94,0.3); 
+        }
+
+        /* Switch buttons */
+        .switch-row {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .sw-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: rgba(75, 85, 99, 0.15);
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.12s;
+        }
+
+        .sw-btn:hover {
+            border-color: rgba(59, 130, 246, 0.4);
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .sw-btn.active {
+            border-color: var(--accent-blue);
+            color: var(--accent-blue);
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        /* Potentiometer slider */
+        .pot-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            appearance: none;
+            -webkit-appearance: none;
+            height: 5px;
+            border-radius: 3px;
+            background: #2a3348;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            cursor: pointer;
+            border: 2px solid var(--bg-primary);
+            box-shadow: 0 0 6px rgba(59,130,246,0.3);
+        }
+
+        .pot-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--accent-blue);
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .pot-range {
+            display: flex;
+            justify-content: space-between;
+            font-size: 9px;
+            color: var(--text-muted);
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* ── Joystick ─────────────────────────────────── */
+        .joystick-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .joystick-card .ctrl-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            align-self: flex-start;
+        }
+
+        .joystick-pad {
+            width: 180px;
+            height: 180px;
+            border-radius: 12px;
+            background: radial-gradient(circle at center, #1e263c 0%, #0d1221 100%);
+            border: 1px solid var(--border-color);
+            position: relative;
+            cursor: grab;
+            touch-action: none;
+            user-select: none;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .joystick-pad:active { cursor: grabbing; }
+
+        /* Cross-hair lines */
+        .joystick-pad::before,
+        .joystick-pad::after {
+            content: '';
+            position: absolute;
+            background: rgba(75, 85, 99, 0.25);
+        }
+
+        .joystick-pad::before {
+            width: 1px;
+            height: 100%;
+            left: 50%;
+            top: 0;
+        }
+
+        .joystick-pad::after {
+            height: 1px;
+            width: 100%;
+            top: 50%;
+            left: 0;
+        }
+
+        .joystick-handle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 0 12px rgba(59,130,246,0.35);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            transition: box-shadow 0.15s;
+        }
+
+        .joystick-handle.dragging {
+            box-shadow: 0 0 20px rgba(59,130,246,0.6);
+        }
+
+        .joystick-coords {
+            display: flex;
+            gap: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .joystick-coords span {
+            color: var(--text-muted);
+        }
+
+        .joystick-coords .val {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .joystick-meta {
+            font-size: 9px;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+        }
+
+        /* ── Console Section ──────────────────────────── */
+        .console-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 8px;
+        }
+
+        .console-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .console-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 23, 42, 0.6);
+        }
+
+        .console-header h3 {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+        }
+
+        .console-clear {
+            font-size: 10px;
+            color: var(--text-muted);
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            transition: color 0.15s;
+        }
+
+        .console-clear:hover { color: var(--text-secondary); }
+
+        .console-body {
+            padding: 10px 14px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .console-body::-webkit-scrollbar { width: 5px; }
+        .console-body::-webkit-scrollbar-track { background: transparent; }
+        .console-body::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+        .log-line { color: var(--text-muted); }
+        .log-line .timestamp { color: var(--text-muted); }
+        .log-line .highlight { color: var(--accent-cyan); font-weight: 500; }
+        .log-line .value-change { color: var(--accent-green); }
+
+        .json-line {
+            word-break: break-all;
+            margin-bottom: 4px;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+
+        .json-line .timestamp { color: var(--text-muted); }
+
+        /* Incoming: game → you (teal/cyan) */
+        .json-line.incoming {
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.06);
+            border-left: 2px solid rgba(6, 182, 212, 0.3);
+        }
+        .json-line.incoming .direction {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        /* Outgoing: you → game (orange) */
+        .json-line.outgoing {
+            color: var(--accent-orange);
+            background: rgba(249, 115, 22, 0.06);
+            border-left: 2px solid rgba(249, 115, 22, 0.3);
+        }
+        .json-line.outgoing .direction {
+            color: var(--accent-orange);
+            font-weight: 700;
+            margin-right: 4px;
+        }
+
+        /* ── No Session ──────────────────────────────── */
+        #no-session {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            gap: 12px;
+            text-align: center;
+        }
+
+        #no-session .icon-big {
+            font-size: 48px;
+            margin-bottom: 8px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.4));
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        #no-session h2 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        #no-session p {
+            color: var(--text-secondary);
+            font-size: 13px;
+            max-width: 380px;
+        }
+
+        #dashboard { display: none; }
+
+        /* ── Responsive ──────────────────────────────── */
+        @media (max-width: 768px) {
+            .console-row { grid-template-columns: 1fr; }
+            .lamp-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        }
+
+        /* Fade in */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.25s ease forwards; }
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+    <div class="header-title">FAIRGROUND <span>API</span></div>
+    <div class="status-badge disconnected" id="statusBadge">
+        <span class="status-dot"></span>
+        <span id="statusText">Disconnected</span>
+    </div>
+</div>
+
+<!-- Connection Bar -->
+<div class="connection-bar">
+    <label>WebSocket URL:</label>
+    <input type="text" id="wsUrlInput" value="ws://127.0.0.1:8765/api" spellcheck="false">
+    <button class="btn-reconnect" id="btnReconnect" onclick="reconnect()">Reconnect</button>
+</div>
+
+<!-- Main -->
+<div class="main">
+
+    <!-- No Session -->
+    <div id="no-session">
+        <div class="icon-big">🎡</div>
+        <h2>No Active Session</h2>
+        <p>Connect to a ride's control panel in-game to see the dashboard here.</p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard">
+
+        <!-- Lights -->
+        <div id="lampsSection" style="display:none;">
+            <div class="section-header">
+                <div class="section-title">Active Lamps</div>
+                <div class="section-count" id="lampsCount"></div>
+            </div>
+            <div class="lamp-grid" id="lampsGrid"></div>
+        </div>
+
+        <!-- Tabs: Buttons / Switches / Potentiometers -->
+        <div class="tabs-container" id="tabsContainer" style="display:none;">
+            <div class="tab-bar" id="tabBar"></div>
+            <div id="tabPanels"></div>
+        </div>
+
+        <!-- Console -->
+        <div class="console-row">
+            <div class="console-panel">
+                <div class="console-header">
+                    <h3>Live Console</h3>
+                    <button class="console-clear" onclick="clearConsole('liveConsole')">Clear</button>
+                </div>
+                <div class="console-body" id="liveConsole"></div>
+            </div>
+            <div class="console-panel">
+                <div class="console-header">
+                    <h3>Raw JSON Stream</h3>
+                    <button class="console-clear" onclick="clearConsole('jsonConsole')">Clear</button>
+                </div>
+                <div class="console-body" id="jsonConsole"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let ws = null;
+    let reconnectTimer = null;
+    let lightStates = {};
+
+    function getWsUrl() {
+        return document.getElementById('wsUrlInput').value.trim();
+    }
+
+    // ── WebSocket ────────────────────────────────────
+    function connect() {
+        const url = getWsUrl();
+        try { ws = new WebSocket(url); } catch(e) { scheduleReconnect(); return; }
+
+        ws.onopen = () => {
+            setStatus(true);
+            clearTimeout(reconnectTimer);
+            logConsole('Connected to ' + url);
+        };
+
+        ws.onclose = () => {
+            setStatus(false);
+            scheduleReconnect();
+        };
+
+        ws.onerror = () => ws.close();
+
+        ws.onmessage = (e) => {
+            logJson(e.data, 'in');
+            try {
+                handleMessage(JSON.parse(e.data));
+            } catch(err) {
+                console.error('Parse error:', err);
+            }
+        };
+    }
+
+    function reconnect() {
+        if (ws) ws.close();
+        clearTimeout(reconnectTimer);
+        connect();
+    }
+
+    function scheduleReconnect() {
+        clearTimeout(reconnectTimer);
+        reconnectTimer = setTimeout(connect, 3000);
+    }
+
+    function send(obj) {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            const json = JSON.stringify(obj);
+            ws.send(json);
+            logJson(json, 'out');
+        }
+    }
+
+    function setStatus(connected) {
+        const badge = document.getElementById('statusBadge');
+        const text = document.getElementById('statusText');
+        badge.className = 'status-badge ' + (connected ? 'connected' : 'disconnected');
+        text.textContent = connected ? 'Connected' : 'Disconnected';
+    }
+
+    // ── Message Handler ─────────────────────────────
+    function handleMessage(msg) {
+        switch(msg.type) {
+            case 'fullState':
+                renderFullState(msg);
+                break;
+            case 'lightUpdate':
+                updateLight(msg);
+                logConsole(`<span class="highlight">${msg.name}</span> changed to <span class="value-change">${msg.mode}</span>`);
+                break;
+            case 'session':
+                if (!msg.active) {
+                    showNoSession();
+                    logConsole('Session lost.');
+                }
+                break;
+        }
+    }
+
+    function showNoSession() {
+        document.getElementById('no-session').style.display = 'flex';
+        document.getElementById('dashboard').style.display = 'none';
+    }
+
+    // ── Console Logging ─────────────────────────────
+    function getTimestamp() {
+        const d = new Date();
+        return `[${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}:${d.getSeconds().toString().padStart(2,'0')}]`;
+    }
+
+    function logConsole(text) {
+        const el = document.getElementById('liveConsole');
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        line.innerHTML = `<span class="timestamp">${getTimestamp()}</span> ${text}`;
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+        // Keep max 200 lines
+        while (el.children.length > 200) el.removeChild(el.firstChild);
+    }
+
+    function logJson(raw, direction) {
+        const el = document.getElementById('jsonConsole');
+        const line = document.createElement('div');
+        const isOut = direction === 'out';
+        line.className = 'json-line ' + (isOut ? 'outgoing' : 'incoming');
+        const arrow = isOut ? '▲' : '▼';
+        const short = raw.length > 300 ? raw.substring(0, 300) + '…' : raw;
+        line.innerHTML = `<span class="timestamp">${getTimestamp()}</span> <span class="direction">${arrow}</span>${escapeHtml(short)}`;
+        el.appendChild(line);
+        el.scrollTop = el.scrollHeight;
+        while (el.children.length > 100) el.removeChild(el.firstChild);
+    }
+
+    function clearConsole(id) {
+        document.getElementById(id).innerHTML = '';
+    }
+
+    function escapeHtml(s) {
+        return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    // ── Render Full State ───────────────────────────
+    function renderFullState(state) {
+        document.getElementById('no-session').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        renderLamps(state.lights || []);
+        renderTabs(state.buttons || [], state.switches || [], state.potentiometers || [], state.joysticks || []);
+        logConsole('Full state received.');
+    }
+
+    // ── Lamps ───────────────────────────────────────
+    function renderLamps(lights) {
+        const section = document.getElementById('lampsSection');
+        const grid = document.getElementById('lampsGrid');
+        const count = document.getElementById('lampsCount');
+
+        if (lights.length === 0) { section.style.display = 'none'; return; }
+        section.style.display = 'block';
+        count.textContent = lights.length + ' detected';
+        grid.innerHTML = '';
+
+        lights.forEach((l, i) => {
+            lightStates[l.id] = l;
+            const card = document.createElement('div');
+            card.className = 'lamp-card fade-in';
+            card.style.animationDelay = (i * 20) + 'ms';
+            card.id = 'lamp-' + l.id;
+
+            const info = document.createElement('div');
+            info.className = 'lamp-info';
+
+            const name = document.createElement('div');
+            name.className = 'lamp-name';
+            name.textContent = l.name;
+            name.title = l.name;
+
+            const state = document.createElement('div');
+            state.className = 'lamp-state';
+            state.id = 'lamp-state-' + l.id;
+            state.textContent = 'State: ' + l.mode;
+
+            info.appendChild(name);
+            info.appendChild(state);
+
+            const dot = document.createElement('div');
+            dot.className = 'lamp-dot ' + getDotClass(l.color, l.mode);
+            dot.id = 'lamp-dot-' + l.id;
+
+            card.appendChild(info);
+            card.appendChild(dot);
+            grid.appendChild(card);
+        });
+    }
+
+    function updateLight(l) {
+        lightStates[l.id] = l;
+        const dot = document.getElementById('lamp-dot-' + l.id);
+        const state = document.getElementById('lamp-state-' + l.id);
+        if (dot) dot.className = 'lamp-dot ' + getDotClass(l.color, l.mode);
+        if (state) state.textContent = 'State: ' + l.mode;
+    }
+
+    function getDotClass(color, mode) {
+        const c = (color || '').toLowerCase();
+        const m = (mode || '').toLowerCase();
+
+        // Off
+        if (m === 'off') return 'off';
+
+        // Determine color class
+        let cls = 'green';
+        if (c.includes('red') || c.includes('rot')) cls = 'red';
+        else if (c.includes('yellow') || c.includes('gelb')) cls = 'yellow';
+        else if (c.includes('blue') || c.includes('blau')) cls = 'blue';
+        else if (c.includes('orange')) cls = 'orange';
+        else if (c.includes('purple') || c.includes('lila')) cls = 'purple';
+        else if (c.includes('white') || c.includes('weiss') || c.includes('weiß')) cls = 'white';
+
+        // Determine strobe speed
+        if (m === 'strobe_fast') return cls + ' strobe-fast';
+        if (m === 'strobe_slow') return cls + ' strobe-slow';
+        if (m === 'strobe') return cls + ' strobe';
+
+        // On (static)
+        return cls;
+    }
+
+    // ── Tabs ────────────────────────────────────────
+    let currentTab = 'buttons';
+
+    function renderTabs(buttons, switches, pots, joysticks) {
+        const container = document.getElementById('tabsContainer');
+        const bar = document.getElementById('tabBar');
+        const panels = document.getElementById('tabPanels');
+
+        const tabs = [];
+        if (buttons.length > 0) tabs.push({ id: 'buttons', label: 'Panel Buttons', count: buttons.length });
+        if (switches.length > 0) tabs.push({ id: 'switches', label: 'Rotary Switches', count: switches.length });
+        if (pots.length > 0) tabs.push({ id: 'pots', label: 'Potentiometers', count: pots.length });
+        if (joysticks.length > 0) tabs.push({ id: 'joysticks', label: 'Joysticks', count: joysticks.length });
+
+        if (tabs.length === 0) { container.style.display = 'none'; return; }
+        container.style.display = 'block';
+
+        // If current tab doesn't exist, pick first
+        if (!tabs.find(t => t.id === currentTab)) currentTab = tabs[0].id;
+
+        // Render tab bar
+        bar.innerHTML = '';
+        tabs.forEach(t => {
+            const btn = document.createElement('button');
+            btn.className = 'tab-btn' + (t.id === currentTab ? ' active' : '');
+            btn.innerHTML = `${t.label} <span class="tab-count">${t.count}</span>`;
+            btn.onclick = () => switchTab(t.id);
+            bar.appendChild(btn);
+        });
+
+        // Render tab panels
+        panels.innerHTML = '';
+
+        if (buttons.length > 0) {
+            const panel = createPanel('buttons');
+            renderButtonCards(panel, buttons);
+            panels.appendChild(panel);
+        }
+
+        if (switches.length > 0) {
+            const panel = createPanel('switches');
+            renderSwitchCards(panel, switches);
+            panels.appendChild(panel);
+        }
+
+        if (pots.length > 0) {
+            const panel = createPanel('pots');
+            renderPotCards(panel, pots);
+            panels.appendChild(panel);
+        }
+
+        if (joysticks.length > 0) {
+            const panel = createPanel('joysticks');
+            renderJoystickCards(panel, joysticks);
+            panels.appendChild(panel);
+        }
+    }
+
+    function createPanel(id) {
+        const panel = document.createElement('div');
+        panel.className = 'tab-content' + (id === currentTab ? ' active' : '');
+        panel.id = 'panel-' + id;
+        return panel;
+    }
+
+    function switchTab(id) {
+        currentTab = id;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+
+        const panel = document.getElementById('panel-' + id);
+        if (panel) panel.classList.add('active');
+
+        // Re-highlight tab bar button by index
+        const bar = document.getElementById('tabBar');
+        const panels = document.querySelectorAll('.tab-content');
+        bar.childNodes.forEach((btn, i) => {
+            const panelId = panels[i]?.id?.replace('panel-', '');
+            btn.classList.toggle('active', panelId === id);
+        });
+    }
+
+    // ── Button Cards ────────────────────────────────
+    function renderButtonCards(container, buttons) {
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+
+        buttons.forEach(b => {
+            const card = document.createElement('div');
+            card.className = 'control-card';
+
+            const name = document.createElement('div');
+            name.className = 'ctrl-name';
+            name.textContent = b.name;
+
+            const btn = document.createElement('button');
+            btn.className = 'btn-press';
+            btn.textContent = 'Press';
+
+            let isPressed = false;
+
+            const press = () => {
+                if (isPressed) return;
+                isPressed = true;
+                send({ action: 'setButton', name: b.name, value: true });
+                logConsole(`Button <span class="highlight">${b.name}</span> <span class="value-change">PRESSED</span>`);
+            };
+
+            const release = () => {
+                if (!isPressed) return;
+                isPressed = false;
+                send({ action: 'setButton', name: b.name, value: false });
+            };
+
+            // Mouse events
+            btn.onmousedown = press;
+            btn.onmouseup = release;
+            btn.onmouseleave = release;
+
+            // Touch events (prevents scroll-triggers if dragging on button)
+            btn.addEventListener('touchstart', (e) => { e.preventDefault(); press(); }, { passive: false });
+            btn.addEventListener('touchend', (e) => { e.preventDefault(); release(); }, { passive: false });
+            btn.addEventListener('touchcancel', (e) => { e.preventDefault(); release(); }, { passive: false });
+
+            card.appendChild(name);
+            card.appendChild(btn);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    // ── Switch Cards ────────────────────────────────
+    function renderSwitchCards(container, switches) {
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+
+        switches.forEach(s => {
+            const card = document.createElement('div');
+            card.className = 'control-card';
+
+            const name = document.createElement('div');
+            name.className = 'ctrl-name';
+            name.textContent = s.name;
+
+            const meta = document.createElement('div');
+            meta.className = 'ctrl-meta';
+            meta.textContent = `Positions: 0 – ${s.maxState}`;
+
+            const row = document.createElement('div');
+            row.className = 'switch-row';
+
+            for (let pos = 0; pos <= s.maxState; pos++) {
+                const btn = document.createElement('button');
+                btn.className = 'sw-btn';
+                btn.textContent = pos;
+                btn.onclick = () => {
+                    row.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    send({ action: 'setSwitch', name: s.name, value: pos });
+                    logConsole(`Switch <span class="highlight">${s.name}</span> set to <span class="value-change">${pos}</span>`);
+                };
+                row.appendChild(btn);
+            }
+
+            card.appendChild(name);
+            card.appendChild(meta);
+            card.appendChild(row);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    // ── Potentiometer Cards ─────────────────────────
+    function renderPotCards(container, pots) {
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+
+        pots.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'control-card';
+
+            const name = document.createElement('div');
+            name.className = 'ctrl-name';
+            name.textContent = p.name;
+
+            const sliderRow = document.createElement('div');
+            sliderRow.className = 'pot-slider-row';
+
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = p.min;
+            slider.max = p.max;
+            slider.step = 1;
+            slider.value = p.current || p.min;
+
+            const val = document.createElement('span');
+            val.className = 'pot-value';
+            val.textContent = slider.value;
+
+            slider.oninput = () => { val.textContent = slider.value; };
+            slider.onchange = () => {
+                send({ action: 'setPotentiometer', name: p.name, value: parseFloat(slider.value) });
+                logConsole(`Poti <span class="highlight">${p.name}</span> set to <span class="value-change">${slider.value}</span>`);
+            };
+
+            const range = document.createElement('div');
+            range.className = 'pot-range';
+            range.innerHTML = `<span>${p.min}</span><span>${p.max}</span>`;
+
+            sliderRow.appendChild(slider);
+            sliderRow.appendChild(val);
+
+            card.appendChild(name);
+            card.appendChild(sliderRow);
+            card.appendChild(range);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    // ── Joystick Cards ───────────────────────────────
+    let _activeJoystickCleanup = [];
+
+    function renderJoystickCards(container, joysticks) {
+        // Remove previous global listeners
+        _activeJoystickCleanup.forEach(fn => fn());
+        _activeJoystickCleanup = [];
+
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+
+        joysticks.forEach(j => {
+            const card = document.createElement('div');
+            card.className = 'joystick-card';
+
+            const name = document.createElement('div');
+            name.className = 'ctrl-name';
+            name.textContent = j.name;
+
+            // Joystick pad
+            const pad = document.createElement('div');
+            pad.className = 'joystick-pad';
+
+            const handle = document.createElement('div');
+            handle.className = 'joystick-handle';
+            pad.appendChild(handle);
+
+            // Coordinate display
+            const coords = document.createElement('div');
+            coords.className = 'joystick-coords';
+            coords.innerHTML = `<span>X: <span class="val" id="joy-x-${j.name}">0.0</span></span>` +
+                               `<span>Y: <span class="val" id="joy-y-${j.name}">0.0</span></span>`;
+
+            // Range info
+            const meta = document.createElement('div');
+            meta.className = 'joystick-meta';
+            meta.textContent = `X: [${j.minX} .. ${j.maxX}]  Y: [${j.minY} .. ${j.maxY}]`;
+
+            card.appendChild(name);
+            card.appendChild(pad);
+            card.appendChild(coords);
+            card.appendChild(meta);
+            grid.appendChild(card);
+
+            // ─ Drag Logic ─
+            let dragging = false;
+            let activeTouchId = null;
+            const HANDLE_R = 16; // half of handle size
+
+            function getInteractionPos(e) {
+                if (e.changedTouches) {
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === activeTouchId) {
+                            return { px: e.changedTouches[i].clientX, py: e.changedTouches[i].clientY };
+                        }
+                    }
+                    return null; // Not our touch
+                }
+                return { px: e.clientX, py: e.clientY };
+            }
+
+            function processPosition(px, py) {
+                const rect = pad.getBoundingClientRect();
+                const cx = rect.width / 2;
+                const cy = rect.height / 2;
+                const maxR = cx - HANDLE_R;
+
+                let localX = px - rect.left;
+                let localY = py - rect.top;
+
+                // Offset from center
+                let dx = localX - cx;
+                let dy = localY - cy;
+
+                // Clamp to circle
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > maxR) {
+                    dx = dx / dist * maxR;
+                    dy = dy / dist * maxR;
+                }
+
+                return { dx, dy, cx, cy, maxR };
+            }
+
+            function updateHandle(dx, dy, cx, maxR) {
+                handle.style.left = (cx + dx) + 'px';
+                handle.style.top = (cx + dy) + 'px';
+
+                // Map to joystick values
+                const normX = dx / maxR; // -1..1
+                const normY = -(dy / maxR); // -1..1 (inverted Y: up = positive)
+
+                // Map to actual ranges
+                const rangeX = j.maxX - j.minX;
+                const rangeY = j.maxY - j.minY;
+                const midX = (j.minX + j.maxX) / 2;
+                const midY = (j.minY + j.maxY) / 2;
+
+                const valX = midX + normX * (rangeX / 2);
+                const valY = midY + normY * (rangeY / 2);
+
+                const xEl = document.getElementById('joy-x-' + j.name);
+                const yEl = document.getElementById('joy-y-' + j.name);
+                if (xEl) xEl.textContent = valX.toFixed(1);
+                if (yEl) yEl.textContent = valY.toFixed(1);
+
+                return { valX, valY };
+            }
+
+            function onDown(e) {
+                // Ignore if already dragging (e.g. secondary touch on same joy)
+                if (dragging) return;
+                e.preventDefault();
+                
+                dragging = true;
+                if (e.changedTouches) {
+                    activeTouchId = e.changedTouches[0].identifier;
+                }
+                
+                handle.classList.add('dragging');
+
+                const pos = getInteractionPos(e) || (e.touches ? { px: e.touches[0].clientX, py: e.touches[0].clientY } : null);
+                if (pos) {
+                    const { dx, dy, cx, cy, maxR } = processPosition(pos.px, pos.py);
+                    updateHandle(dx, dy, cx, maxR);
+                }
+            }
+
+            function onMove(e) {
+                if (!dragging) return;
+                
+                const pos = getInteractionPos(e);
+                if (!pos) return;
+
+                e.preventDefault();
+                const { dx, dy, cx, cy, maxR } = processPosition(pos.px, pos.py);
+                const { valX, valY } = updateHandle(dx, dy, cx, maxR);
+                send({ action: 'setJoystick', name: j.name, x: valX, y: valY });
+            }
+
+            function onUp(e) {
+                if (!dragging) return;
+
+                if (e.changedTouches) {
+                    let found = false;
+                    for (let i = 0; i < e.changedTouches.length; i++) {
+                        if (e.changedTouches[i].identifier === activeTouchId) found = true;
+                    }
+                    if (!found) return; // Not our active touch ending
+                }
+
+                dragging = false;
+                activeTouchId = null;
+                handle.classList.remove('dragging');
+            }
+
+            // Mouse events
+            pad.addEventListener('mousedown', onDown);
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+
+            // Touch events
+            pad.addEventListener('touchstart', onDown, { passive: false });
+            document.addEventListener('touchmove', onMove, { passive: false });
+            document.addEventListener('touchend', onUp);
+
+            // Track cleanup for global listeners
+            _activeJoystickCleanup.push(() => {
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend', onUp);
+            });
+        });
+
+        container.appendChild(grid);
+    }
+
+    // ── Init ─────────────────────────────────────────
+    connect();
+</script>
+</body>
+</html>
