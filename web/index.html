@@ -804,6 +804,7 @@
 
         ws.onclose = () => {
             setStatus(false);
+            showNoSession();
             scheduleReconnect();
         };
 
