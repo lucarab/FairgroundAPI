@@ -11,14 +11,14 @@ using UnityEngine;
 namespace FairgroundAPI.Core
 {
     /// <summary>
-    /// Main entry point for the Fairground Control Panel API plugin.
+    /// Main entry point for the FairgroundAPI plugin.
     /// Initializes Harmony patches, resolves obfuscated methods, and starts the WebSocket server.
     /// </summary>
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     public class FairgroundPlugin : BasePlugin
     {
         public const string PLUGIN_GUID = "com.invalidluca.fairground.api";
-        public const string PLUGIN_NAME = "Fairground Control Panel API";
+        public const string PLUGIN_NAME = "FairgroundAPI";
         public const string PLUGIN_VERSION = "1.0.0";
 
         public static FairgroundPlugin Instance { get; private set; }

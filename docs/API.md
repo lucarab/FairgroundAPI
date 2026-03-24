@@ -1,6 +1,6 @@
-# Fairground Control Panel API Documentation
+# FairgroundAPI Documentation
 
-Welcome to the documentation for the Fairground Control Panel API. This API allows you to remotely control and monitor rides in the game via a local WebSocket connection.
+Welcome to the documentation for the FairgroundAPI. This API allows you to remotely control and monitor rides in the game via a local WebSocket connection.
 
 ---
 

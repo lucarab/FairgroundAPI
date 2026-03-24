@@ -1,4 +1,4 @@
 theme: jekyll-theme-cayman
-title: Fairground Control Panel API
+title: FairgroundAPI
 description: A WebSocket API and Web Dashboard to remotely control rides.
 show_downloads: true
