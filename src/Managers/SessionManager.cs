@@ -41,7 +41,7 @@ namespace FairgroundAPI.Managers
             {
                 if (ActiveRightsControllerId == controllerId)
                 {
-                    FairgroundPlugin.Log.LogInfo("Lost rights to the active controller.");
+                    FairgroundPlugin.Log.LogDebug("Lost rights to the active controller.");
                     ClearSession();
                     WebSocketManager.BroadcastSessionLost();
                 }
@@ -50,12 +50,12 @@ namespace FairgroundAPI.Managers
 
             if (HasActiveSession)
             {
-                FairgroundPlugin.Log.LogInfo("Switching controller. Clearing previous session.");
+                FairgroundPlugin.Log.LogDebug("Switching controller. Clearing previous session.");
                 ClearSession();
             }
 
             ActiveRightsControllerId = controllerId;
-            FairgroundPlugin.Log.LogInfo("Acquired rights to a new controller. Scanning components...");
+            FairgroundPlugin.Log.LogDebug("Acquired rights to a new controller. Scanning components...");
 
             ControlPanelScanner.ScanAndPopulate(rightsController);
 
@@ -65,7 +65,7 @@ namespace FairgroundAPI.Managers
 
         private static void LogScannedComponents()
         {
-            FairgroundPlugin.Log.LogInfo(
+            FairgroundPlugin.Log.LogDebug(
                 $"Scan complete: {TrackedLights.Count} Lights, {TrackedButtons.Count} Buttons, " +
                 $"{TrackedSwitches.Count} Switches, {TrackedPotentiometers.Count} Potentiometers, " +
                 $"{TrackedJoysticks.Count} Joysticks, {TrackedStopButtons.Count} StopButtons, " +
@@ -91,7 +91,7 @@ namespace FairgroundAPI.Managers
             TrackedSliders.Clear();
             TrackedPresetButtons.Clear();
             Components.MainLoopComponent.Instance?.ClearCache();
-            FairgroundPlugin.Log.LogInfo("Session cleared.");
+            FairgroundPlugin.Log.LogDebug("Session cleared.");
         }
     }
 }

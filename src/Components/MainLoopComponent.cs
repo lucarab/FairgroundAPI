@@ -89,7 +89,11 @@ namespace FairgroundAPI.Components
 
                 string currentMode = light.Light_Mode.ToString();
 
-                if (!_lastKnownModes.TryGetValue(kvp.Key, out string lastMode) || lastMode != currentMode)
+                if (!_lastKnownModes.TryGetValue(kvp.Key, out string lastMode))
+                {
+                    _lastKnownModes[kvp.Key] = currentMode;
+                }
+                else if (lastMode != currentMode)
                 {
                     _lastKnownModes[kvp.Key] = currentMode;
                     string color = MaterialHelper.ExtractColorName(light);
@@ -110,7 +114,11 @@ namespace FairgroundAPI.Components
 
                 int currentState = sync.Value;
 
-                if (!_lastKnownMultyToggleStates.TryGetValue(kvp.Key, out int lastState) || lastState != currentState)
+                if (!_lastKnownMultyToggleStates.TryGetValue(kvp.Key, out int lastState))
+                {
+                    _lastKnownMultyToggleStates[kvp.Key] = currentState;
+                }
+                else if (lastState != currentState)
                 {
                     _lastKnownMultyToggleStates[kvp.Key] = currentState;
                     WebSocketManager.BroadcastMultyToggleUpdate(kvp.Key, currentState);
@@ -130,7 +138,11 @@ namespace FairgroundAPI.Components
 
                 int currentValue = sync.Value;
 
-                if (!_lastKnownDropdownValues.TryGetValue(kvp.Key, out int lastValue) || lastValue != currentValue)
+                if (!_lastKnownDropdownValues.TryGetValue(kvp.Key, out int lastValue))
+                {
+                    _lastKnownDropdownValues[kvp.Key] = currentValue;
+                }
+                else if (lastValue != currentValue)
                 {
                     _lastKnownDropdownValues[kvp.Key] = currentValue;
                     WebSocketManager.BroadcastDropdownUpdate(kvp.Key, currentValue);
@@ -150,7 +162,11 @@ namespace FairgroundAPI.Components
 
                 float currentValue = slider.Value;
 
-                if (!_lastKnownSliderValues.TryGetValue(kvp.Key, out float lastValue) || lastValue != currentValue)
+                if (!_lastKnownSliderValues.TryGetValue(kvp.Key, out float lastValue))
+                {
+                    _lastKnownSliderValues[kvp.Key] = currentValue;
+                }
+                else if (lastValue != currentValue)
                 {
                     _lastKnownSliderValues[kvp.Key] = currentValue;
                     WebSocketManager.BroadcastSliderUpdate(kvp.Key, currentValue);
