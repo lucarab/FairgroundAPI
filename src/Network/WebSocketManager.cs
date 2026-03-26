@@ -57,10 +57,11 @@ namespace FairgroundAPI.Network
             try
             {
                 int port = FairgroundPlugin.ConfigPort.Value;
-                _server = new WebSocketServer($"ws://127.0.0.1:{port}");
+                string ip = FairgroundPlugin.ConfigListenIP.Value;
+                _server = new WebSocketServer($"ws://{ip}:{port}");
                 _server.AddWebSocketService<ApiService>("/api");
                 _server.Start();
-                Log.LogInfo($"[WebSocket] Server started on ws://127.0.0.1:{port}/api");
+                Log.LogInfo($"[WebSocket] Server started on ws://{ip}:{port}/api");
             }
             catch (System.Exception ex)
             {

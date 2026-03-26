@@ -25,6 +25,7 @@ namespace FairgroundAPI.Core
         public static FairgroundPlugin Instance { get; private set; }
         internal new static ManualLogSource Log;
 
+        public static ConfigEntry<string> ConfigListenIP { get; private set; }
         public static ConfigEntry<int> ConfigPort { get; private set; }
         public static ConfigEntry<float> ConfigPollRate { get; private set; }
 
@@ -33,6 +34,7 @@ namespace FairgroundAPI.Core
             Instance = this;
             Log = base.Log;
 
+            ConfigListenIP = Config.Bind("Network", "ListenIP", "0.0.0.0", "The IP address the WebSocket server will bind to. Use '127.0.0.1' for local connections only, or '0.0.0.0' to allow devices on your local Wi-Fi network (like a tablet) to connect.");
             ConfigPort = Config.Bind("Network", "Port", 8765, "The port on which the WebSocket server will listen.");
             ConfigPollRate = Config.Bind("Performance", "PollRate", 0.5f, "How often (in seconds) the API will check for state changes (lights, sliders, etc.). Lower values mean faster updates but higher CPU usage.");
 

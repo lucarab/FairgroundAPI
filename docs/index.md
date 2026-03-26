@@ -34,6 +34,7 @@ _Note: You must have [BepInEx 6 Bleeding Edge (IL2CPP version)](https://builds.b
 After running the game with the plugin installed for the first time, an auto-generated configuration file will appear at `BepInEx/config/com.invalidluca.fairground.api.cfg`.
 You can edit this file to change:
 
+- **Listen IP**: Change the bind IP (default: `0.0.0.0` to allow local-network devices like tablets to connect). Set this to `127.0.0.1` if you want to strictly restrict connections to your local PC.
 - **WebSocket Port**: Change the listening port (default: `8765`). If you change this, make sure to update the URL in your web dashboard.
 - **Poll Rate**: Adjust how frequently the API checks for ride state changes, like blinking lights (default: `0.5` seconds). Lower values mean faster light updates but consume more CPU usage.
 
