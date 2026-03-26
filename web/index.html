@@ -1528,9 +1528,9 @@
         stopButtons.forEach(i => addRow('Stop Button', i.name, 'Action: Toggle Emergency Stop', JSON.stringify({ action: 'toggleStopButton', name: i.name })));
         switches.forEach(i => addRow('Rotary Switch', i.name, 'Values: Integer from 0 to ' + i.maxState, JSON.stringify({ action: 'setSwitch', name: i.name, value: i.maxState > 0 ? 1 : 0 })));
         pots.forEach(i => addRow('Potentiometer', i.name, 'Values: Float from ' + i.min.toFixed(2) + ' to ' + i.max.toFixed(2), JSON.stringify({ action: 'setPotentiometer', name: i.name, value: Number(i.max.toFixed(2)) })));
-        joysticks.forEach(i => addRow('Joystick', i.name, 'Payload: JSON {x, y} floats from -1.0 to 1.0', JSON.stringify({ action: 'setJoystick', name: i.name, x: 0.5, y: -0.5 })));
+        joysticks.forEach(i => addRow('Joystick', i.name, 'Values: Float X (' + i.minX.toFixed(2) + ' to ' + i.maxX.toFixed(2) + '), Y (' + i.minY.toFixed(2) + ' to ' + i.maxY.toFixed(2) + ')', JSON.stringify({ action: 'setJoystick', name: i.name, x: Number(i.maxX.toFixed(2)), y: Number(i.maxY.toFixed(2)) })));
         presetButtons.forEach(i => addRow('Preset Button', i.name, 'Action: Trigger activation (no extra params needed)', JSON.stringify({ action: 'pressPreset', name: i.name })));
-        multyToggles.forEach(i => addRow('Multy Toggle', i.name, 'Action: Toggle state (no param needed to swap) OR state index', JSON.stringify({ action: 'toggleMultyToggle', name: i.name })));
+        multyToggles.forEach(i => addRow('Multy Toggle', i.name, 'Action: Toggle state (no param needed to swap)', JSON.stringify({ action: 'toggleMultyToggle', name: i.name })));
         dropdowns.forEach(i => addRow('Dropdown', i.name, 'Values: Integer index 0 to ' + (i.options ? i.options.length - 1 : 0), JSON.stringify({ action: 'setDropdown', name: i.name, value: 0 })));
         sliders.forEach(i => addRow('Slider', i.name, 'Values: Float from ' + i.min.toFixed(2) + ' to ' + i.max.toFixed(2), JSON.stringify({ action: 'setSlider', name: i.name, value: Number(i.max.toFixed(2)) })));
         lights.forEach(i => addRow('Status Light (READ-ONLY)', i.name, 'Color: ' + i.color + ' | Modes: On, Off, Strobe, Strobe_Fast, Strobe_Slow', JSON.stringify({ type: 'lightUpdate', name: i.name, color: i.color, mode: 'On' })));

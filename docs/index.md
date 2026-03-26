@@ -3,11 +3,14 @@
 Welcome to the **FairgroundAPI**! This is a BepInEx / IL2CPP mod for the game [**Fairground Online**](https://store.steampowered.com/app/3310530/Fairground_Online/) that exposes the control panels of in-game rides via a **WebSocket** and a beautiful **Web Dashboard**. It enables you to control rides from your desktop browser, a mobile tablet, or even a physical hardware controller!
 
 <p align="center">
-  <img src="https://i.imgur.com/cYcF9RW.png" width="48%" />
-  <img src="https://i.imgur.com/g65umLl.png" width="48%" />
+  <img src="https://i.imgur.com/gnfmqcJ.png" width="48%" />
+  <img src="https://i.imgur.com/IOmSEs8.png" width="48%" />
   <br>
-  <img src="https://i.imgur.com/P0ePvgf.png" width="48%" />
-  <img src="https://i.imgur.com/Mgz20AQ.png" width="48%" />
+  <img src="https://i.imgur.com/KVhHBMH.png" width="48%" />
+  <img src="https://i.imgur.com/aJ14lt5.png" width="48%" />
+  <br>
+  <img src="https://i.imgur.com/nlHMwEZ.png" width="48%" />
+  <img src="https://i.imgur.com/pJ3jWVd.png" width="48%" />
 </p>
 
 ## ✨ Features
