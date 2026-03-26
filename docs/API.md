@@ -2,15 +2,11 @@
 
 Welcome to the documentation for the FairgroundAPI. This API allows you to remotely control and monitor rides in the game via a local WebSocket connection.
 
----
-
 ## 🔌 Connection
 
 **Endpoint URL:** `ws://127.0.0.1:8765/api` _(The port is configurable in the BepInEx config)_
 
 The API uses standard WebSockets. You can connect to it using Javascript in a browser, Python, C#, or any other language that supports WebSockets.
-
----
 
 ## 🛠️ Built-in Developer Reference
 
@@ -24,8 +20,6 @@ Simply double-click `web/index.html` in your browser while connected to a ride i
 - A live event console to observe incoming traffic.
 
 This makes developing for specific rides easy!
-
----
 
 ## 📥 Incoming Commands (Web → Game)
 
@@ -159,8 +153,6 @@ Forces the server to broadcast the complete state of the control panel again.
 }
 ```
 
----
-
 ## 📤 Outgoing Messages (Game → Web)
 
 The server sends these JSON objects to all connected clients.
@@ -235,8 +227,6 @@ Sent when the local player loses control of the ride panel (e.g. by stepping awa
   "active": false
 }
 ```
-
----
 
 ## 💬 Support & Feedback
 

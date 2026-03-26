@@ -28,8 +28,9 @@ _Note: You must have [BepInEx 6 Bleeding Edge (IL2CPP version)](https://builds.b
 
 ## ⚙️ Configuration
 
-After running the game with the plugin installed for the first time, an auto-generated configuration file will appear at `BepInEx/config/com.invalidluca.fairground.api.cfg`. 
+After running the game with the plugin installed for the first time, an auto-generated configuration file will appear at `BepInEx/config/com.invalidluca.fairground.api.cfg`.
 You can edit this file to change:
+
 - **WebSocket Port**: Change the listening port (default: `8765`). If you change this, make sure to update the URL in your web dashboard.
 - **Poll Rate**: Adjust how frequently the API checks for ride state changes, like blinking lights (default: `0.5` seconds). Lower values mean faster light updates but consume more CPU usage.
 
@@ -41,8 +42,6 @@ We have fully documented the entire WebSocket interface (JSON payloads in and ou
 **Tip:** The included Web Dashboard (`web/index.html`) features a live **Developer API Reference** tab that automatically lists every single component on the ride you are currently controlling, complete with click-to-copy API names and JSON examples!
 
 👉 **[Read the API Documentation here](https://lucarab.github.io/FairgroundAPI/API.html)**
-
----
 
 ## 💬 Support & Feedback
 
