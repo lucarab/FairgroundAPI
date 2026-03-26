@@ -26,6 +26,7 @@ namespace FairgroundAPI.Network
         public SwitchData[] switches;
         public PotentiometerData[] potentiometers;
         public JoystickData[] joysticks;
+        public StopButtonData[] stopButtons;
     }
 
     [Serializable]
@@ -35,6 +36,13 @@ namespace FairgroundAPI.Network
         public string name;
         public string color;
         public string mode;
+    }
+
+    [Serializable]
+    public class StopButtonUpdateMessage : WsMessage
+    {
+        public string name;
+        public bool isDown;
     }
 
     /// <summary>
@@ -81,6 +89,13 @@ namespace FairgroundAPI.Network
         public float maxY;
         public float currentX;
         public float currentY;
+    }
+
+    [Serializable]
+    public class StopButtonData
+    {
+        public string name;
+        public bool isDown;
     }
 
     /// <summary>

@@ -103,7 +103,8 @@ namespace FairgroundAPI.Network
                 buttons = BuildButtonData(),
                 switches = BuildSwitchData(),
                 potentiometers = BuildPotentiometerData(),
-                joysticks = BuildJoystickData()
+                joysticks = BuildJoystickData(),
+                stopButtons = BuildStopButtonData()
             };
 
             Broadcast(ToJson(msg));
@@ -128,6 +129,19 @@ namespace FairgroundAPI.Network
         public static void BroadcastSessionLost()
         {
             Broadcast(ToJson(new SessionMessage { type = "session", active = false }));
+        }
+
+        /// <summary>Broadcasts a stop button state change to all clients.</summary>
+        public static void BroadcastStopButtonUpdate(string name, bool isDown)
+        {
+            var msg = new StopButtonUpdateMessage
+            {
+                type = "stopButtonUpdate",
+                name = name,
+                isDown = isDown
+            };
+
+            Broadcast(ToJson(msg));
         }
 
         /// <summary>
@@ -170,6 +184,11 @@ namespace FairgroundAPI.Network
 
                     case "requestFullState":
                         SendFullState();
+                        break;
+
+                    case "toggleStopButton":
+                        var sbCmd = FromJson<IncomingCommand>(data);
+                        InteractionManager.ToggleStopButton(sbCmd.name);
                         break;
 
                     default:
@@ -262,6 +281,23 @@ namespace FairgroundAPI.Network
                     maxY = j.max_Rot_Y,
                     currentX = j.c_Rot_X,
                     currentY = j.c_Rot_Y
+                });
+            }
+            return list.ToArray();
+        }
+
+        private static StopButtonData[] BuildStopButtonData()
+        {
+            var list = new List<StopButtonData>();
+            foreach (var kvp in SessionManager.TrackedStopButtons)
+            {
+                var sb = kvp.Value;
+                if (sb.WasCollected) continue;
+
+                list.Add(new StopButtonData
+                {
+                    name = kvp.Key,
+                    isDown = sb.Is_Down
                 });
             }
             return list.ToArray();

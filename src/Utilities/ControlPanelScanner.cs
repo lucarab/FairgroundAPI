@@ -20,6 +20,7 @@ namespace FairgroundAPI.Utilities
             Managers.SessionManager.TrackedSwitches.Clear();
             Managers.SessionManager.TrackedPotentiometers.Clear();
             Managers.SessionManager.TrackedJoysticks.Clear();
+            Managers.SessionManager.TrackedStopButtons.Clear();
 
             Transform root = FindRideRoot(rightsController.transform);
 
@@ -28,6 +29,7 @@ namespace FairgroundAPI.Utilities
             ScanComponents(root, Managers.SessionManager.TrackedSwitches);
             ScanComponents(root, Managers.SessionManager.TrackedPotentiometers);
             ScanComponents(root, Managers.SessionManager.TrackedJoysticks);
+            ScanComponents(root, Managers.SessionManager.TrackedStopButtons);
         }
 
         /// <summary>

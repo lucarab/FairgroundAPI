@@ -95,6 +95,23 @@ namespace FairgroundAPI.Managers
             Log.LogDebug($"[Command] Joystick SET to ({clampedX:F1}, {clampedY:F1}) -> {name}");
         }
 
+        /// <summary>Toggles a stop button – pressing it down or releasing it back up.</summary>
+        public static void ToggleStopButton(string name)
+        {
+            if (!EnsureReady()) return;
+
+            if (!SessionManager.TrackedStopButtons.TryGetValue(name, out Stop_Button stopButton))
+            {
+                Log.LogWarning($"StopButton '{name}' not found on this console.");
+                return;
+            }
+
+            if (stopButton.WasCollected) return;
+
+            MethodResolver.InvokeStopButtonToggle(stopButton);
+            Log.LogDebug($"[Command] StopButton TOGGLED -> {name} (Is_Down: {stopButton.Is_Down})");
+        }
+
         private static bool EnsureReady()
         {
             if (!SessionManager.HasActiveSession)

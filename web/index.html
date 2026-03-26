@@ -392,6 +392,57 @@
             background: rgba(34,197,94,0.3); 
         }
 
+        /* Stop Button controls */
+        .btn-stop {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 rgba(239, 68, 68, 0.3);
+            margin-bottom: 4px;
+        }
+
+        .btn-stop:hover {
+            background: rgba(239, 68, 68, 0.15);
+            box-shadow: 0 4px 0 rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-stop.pressed {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(239, 68, 68, 0);
+            background: rgba(239, 68, 68, 0.35);
+            border-color: rgba(239, 68, 68, 0.7);
+            color: #fca5a5;
+        }
+
+        .stop-status {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .stop-status.up {
+            color: var(--accent-green);
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .stop-status.down {
+            color: var(--accent-red);
+            background: rgba(239, 68, 68, 0.12);
+        }
+
         /* Switch buttons */
         .switch-row {
             display: flex;
@@ -856,6 +907,10 @@
                 updateLight(msg);
                 logConsole(`<span class="highlight">${msg.name}</span> changed to <span class="value-change">${msg.mode}</span>`);
                 break;
+            case 'stopButtonUpdate':
+                updateStopButton(msg);
+                logConsole(`StopButton <span class="highlight">${msg.name}</span> is now <span class="value-change">${msg.isDown ? 'DOWN' : 'UP'}</span>`);
+                break;
             case 'session':
                 if (!msg.active) {
                     showNoSession();
@@ -914,7 +969,7 @@
         document.getElementById('dashboard').style.display = 'block';
 
         renderLamps(state.lights || []);
-        renderTabs(state.buttons || [], state.switches || [], state.potentiometers || [], state.joysticks || []);
+        renderTabs(state.buttons || [], state.switches || [], state.potentiometers || [], state.joysticks || [], state.stopButtons || []);
         logConsole('Full state received.');
     }
 
@@ -998,13 +1053,14 @@
     // ── Tabs ────────────────────────────────────────
     let currentTab = 'buttons';
 
-    function renderTabs(buttons, switches, pots, joysticks) {
+    function renderTabs(buttons, switches, pots, joysticks, stopButtons) {
         const container = document.getElementById('tabsContainer');
         const bar = document.getElementById('tabBar');
         const panels = document.getElementById('tabPanels');
 
         const tabs = [];
         if (buttons.length > 0) tabs.push({ id: 'buttons', label: 'Panel Buttons', count: buttons.length });
+        if (stopButtons.length > 0) tabs.push({ id: 'stopButtons', label: 'Stop Buttons', count: stopButtons.length });
         if (switches.length > 0) tabs.push({ id: 'switches', label: 'Rotary Switches', count: switches.length });
         if (pots.length > 0) tabs.push({ id: 'pots', label: 'Potentiometers', count: pots.length });
         if (joysticks.length > 0) tabs.push({ id: 'joysticks', label: 'Joysticks', count: joysticks.length });
@@ -1049,6 +1105,12 @@
         if (joysticks.length > 0) {
             const panel = createPanel('joysticks');
             renderJoystickCards(panel, joysticks);
+            panels.appendChild(panel);
+        }
+
+        if (stopButtons.length > 0) {
+            const panel = createPanel('stopButtons');
+            renderStopButtonCards(panel, stopButtons);
             panels.appendChild(panel);
         }
     }
@@ -1125,6 +1187,72 @@
         });
 
         container.appendChild(grid);
+    }
+
+    // ── Stop Button Cards ────────────────────────────
+    function renderStopButtonCards(container, stopButtons) {
+        const grid = document.createElement('div');
+        grid.className = 'controls-grid';
+
+        stopButtons.forEach(sb => {
+            const card = document.createElement('div');
+            card.className = 'control-card';
+            card.id = 'stopbtn-card-' + sb.name;
+
+            const nameRow = document.createElement('div');
+            nameRow.style.display = 'flex';
+            nameRow.style.alignItems = 'center';
+            nameRow.style.marginBottom = '10px';
+
+            const name = document.createElement('div');
+            name.className = 'ctrl-name';
+            name.style.marginBottom = '0';
+            name.textContent = sb.name;
+
+            const status = document.createElement('span');
+            status.className = 'stop-status ' + (sb.isDown ? 'down' : 'up');
+            status.id = 'stopbtn-status-' + sb.name;
+            status.textContent = sb.isDown ? 'DOWN' : 'UP';
+
+            nameRow.appendChild(name);
+            nameRow.appendChild(status);
+
+            const btn = document.createElement('button');
+            btn.className = 'btn-stop' + (sb.isDown ? ' pressed' : '');
+            btn.id = 'stopbtn-btn-' + sb.name;
+            btn.textContent = sb.isDown ? '⬆ Release' : '⬇ Press Down';
+
+            btn.onclick = () => {
+                send({ action: 'toggleStopButton', name: sb.name });
+                logConsole(`StopButton <span class="highlight">${sb.name}</span> <span class="value-change">TOGGLED</span>`);
+            };
+
+            card.appendChild(nameRow);
+            card.appendChild(btn);
+            grid.appendChild(card);
+        });
+
+        container.appendChild(grid);
+    }
+
+    function updateStopButton(msg) {
+        const btn = document.getElementById('stopbtn-btn-' + msg.name);
+        const status = document.getElementById('stopbtn-status-' + msg.name);
+
+        if (btn) {
+            if (msg.isDown) {
+                btn.classList.add('pressed');
+                btn.textContent = '⬆ Release';
+            } else {
+                btn.classList.remove('pressed');
+                btn.textContent = '⬇ Press Down';
+            }
+        }
+
+        if (status) {
+            status.className = 'stop-status ' + (msg.isDown ? 'down' : 'up');
+            status.textContent = msg.isDown ? 'DOWN' : 'UP';
+        }
     }
 
     // ── Switch Cards ────────────────────────────────

@@ -17,6 +17,7 @@ namespace FairgroundAPI.Managers
         public static Dictionary<string, Rot_Switch> TrackedSwitches { get; } = new();
         public static Dictionary<string, Potentiometer> TrackedPotentiometers { get; } = new();
         public static Dictionary<string, Joystick> TrackedJoysticks { get; } = new();
+        public static Dictionary<string, Stop_Button> TrackedStopButtons { get; } = new();
 
         public static bool HasActiveSession => ActiveRightsControllerId != 0;
 
@@ -61,7 +62,7 @@ namespace FairgroundAPI.Managers
             FairgroundPlugin.Log.LogInfo(
                 $"Scan complete: {TrackedLights.Count} Lights, {TrackedButtons.Count} Buttons, " +
                 $"{TrackedSwitches.Count} Switches, {TrackedPotentiometers.Count} Potentiometers, " +
-                $"{TrackedJoysticks.Count} Joysticks."
+                $"{TrackedJoysticks.Count} Joysticks, {TrackedStopButtons.Count} StopButtons."
             );
         }
 
@@ -76,6 +77,7 @@ namespace FairgroundAPI.Managers
             TrackedSwitches.Clear();
             TrackedPotentiometers.Clear();
             TrackedJoysticks.Clear();
+            TrackedStopButtons.Clear();
             Components.MainLoopComponent.Instance?.ClearCache();
             FairgroundPlugin.Log.LogInfo("Session cleared.");
         }

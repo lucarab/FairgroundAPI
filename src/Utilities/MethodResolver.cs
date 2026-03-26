@@ -20,6 +20,8 @@ namespace FairgroundAPI.Utilities
         private static object _kindBool, _kindInt, _kindFloat, _kindVector2;
         private static readonly Dictionary<Type, MethodInfo> _applyCache = new();
 
+        private static MethodInfo _stopButtonToggleMethod;
+
         public static bool IsResolved { get; private set; }
 
         /// <summary>
@@ -29,7 +31,10 @@ namespace FairgroundAPI.Utilities
         {
             Log.LogInfo("[Resolver] Starting obfuscated method resolution...");
 
-            IsResolved = ResolveApplyValue();
+            bool applyOk = ResolveApplyValue();
+            bool stopBtnOk = ResolveStopButtonToggle();
+
+            IsResolved = applyOk && stopBtnOk;
 
             Log.LogInfo(IsResolved
                 ? "[Resolver] All methods resolved successfully."
@@ -160,6 +165,39 @@ namespace FairgroundAPI.Utilities
             }
 
             method.Invoke(component, new[] { record });
+        }
+
+        /// <summary>
+        /// Resolves the toggle method on Stop_Button by its known obfuscated name.
+        /// The method "ljq" is a void, parameterless method that toggles the button state.
+        /// </summary>
+        private static bool ResolveStopButtonToggle()
+        {
+            const string toggleMethodName = "ljq";
+
+            _stopButtonToggleMethod = typeof(Stop_Button)
+                .GetMethod(toggleMethodName, BindingFlags.Instance | BindingFlags.Public);
+
+            if (_stopButtonToggleMethod != null)
+            {
+                Log.LogDebug($"[Resolver] StopButton toggle -> '{toggleMethodName}'");
+                return true;
+            }
+
+            Log.LogWarning($"[Resolver] Could not find method '{toggleMethodName}' on Stop_Button. StopButton support disabled.");
+            return false;
+        }
+
+        /// <summary>Invokes the resolved toggle method on a Stop_Button instance.</summary>
+        public static void InvokeStopButtonToggle(Stop_Button stopButton)
+        {
+            if (_stopButtonToggleMethod == null)
+            {
+                Log.LogError("[Resolver] StopButton toggle method not resolved.");
+                return;
+            }
+
+            _stopButtonToggleMethod.Invoke(stopButton, null);
         }
     }
 }
