@@ -1,4 +1,5 @@
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using FairgroundAPI.Components;
@@ -19,15 +20,21 @@ namespace FairgroundAPI.Core
     {
         public const string PLUGIN_GUID = "com.invalidluca.fairground.api";
         public const string PLUGIN_NAME = "FairgroundAPI";
-        public const string PLUGIN_VERSION = "1.0.0";
+        public const string PLUGIN_VERSION = "1.0.2";
 
         public static FairgroundPlugin Instance { get; private set; }
         internal new static ManualLogSource Log;
+
+        public static ConfigEntry<int> ConfigPort { get; private set; }
+        public static ConfigEntry<float> ConfigPollRate { get; private set; }
 
         public override void Load()
         {
             Instance = this;
             Log = base.Log;
+
+            ConfigPort = Config.Bind("Network", "Port", 8765, "The port on which the WebSocket server will listen.");
+            ConfigPollRate = Config.Bind("Performance", "PollRate", 0.5f, "How often (in seconds) the API will check for state changes (lights, sliders, etc.). Lower values mean faster updates but higher CPU usage.");
 
             Log.LogInfo($"{PLUGIN_NAME} v{PLUGIN_VERSION} initiated.");
 

@@ -3,6 +3,8 @@ using BepInEx.Logging;
 using FairgroundAPI.Core;
 using FairgroundAPI.Managers;
 using FairgroundAPI.Utilities;
+using TMPro;
+using UnityEngine.UI;
 using WebSocketSharp;
 using WebSocketSharp.Server;
 
@@ -42,7 +44,6 @@ namespace FairgroundAPI.Network
     {
         private static WebSocketServer _server;
         private static ManualLogSource Log => FairgroundPlugin.Log;
-        private const int Port = 8765;
 
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -55,10 +56,11 @@ namespace FairgroundAPI.Network
         {
             try
             {
-                _server = new WebSocketServer($"ws://127.0.0.1:{Port}");
+                int port = FairgroundPlugin.ConfigPort.Value;
+                _server = new WebSocketServer($"ws://127.0.0.1:{port}");
                 _server.AddWebSocketService<ApiService>("/api");
                 _server.Start();
-                Log.LogInfo($"[WebSocket] Server started on ws://127.0.0.1:{Port}/api");
+                Log.LogInfo($"[WebSocket] Server started on ws://127.0.0.1:{port}/api");
             }
             catch (System.Exception ex)
             {
@@ -105,19 +107,21 @@ namespace FairgroundAPI.Network
                 potentiometers = BuildPotentiometerData(),
                 joysticks = BuildJoystickData(),
                 stopButtons = BuildStopButtonData(),
-                multyToggles = BuildMultyToggleData()
+                multyToggles = BuildMultyToggleData(),
+                dropdowns = BuildDropdownData(),
+                sliders = BuildSliderData(),
+                presetButtons = BuildPresetButtonData()
             };
 
             Broadcast(ToJson(msg));
         }
 
         /// <summary>Broadcasts a single light's state change to all clients.</summary>
-        public static void BroadcastLightUpdate(int id, string name, string color, string mode)
+        public static void BroadcastLightUpdate(string name, string color, string mode)
         {
             var msg = new LightUpdateMessage
             {
                 type = "lightUpdate",
-                id = id,
                 name = name,
                 color = color,
                 mode = mode
@@ -130,6 +134,45 @@ namespace FairgroundAPI.Network
         public static void BroadcastSessionLost()
         {
             Broadcast(ToJson(new SessionMessage { type = "session", active = false }));
+        }
+
+        /// <summary>Broadcasts a multy toggle state change to all clients.</summary>
+        public static void BroadcastMultyToggleUpdate(string name, int value)
+        {
+            var msg = new MultyToggleUpdateMessage
+            {
+                type = "multyToggleUpdate",
+                name = name,
+                value = value
+            };
+
+            Broadcast(ToJson(msg));
+        }
+
+        /// <summary>Broadcasts a dropdown value change to all clients.</summary>
+        public static void BroadcastDropdownUpdate(string name, int selectedIndex)
+        {
+            var msg = new DropdownUpdateMessage
+            {
+                type = "dropdownUpdate",
+                name = name,
+                selectedIndex = selectedIndex
+            };
+
+            Broadcast(ToJson(msg));
+        }
+
+        /// <summary>Broadcasts a slider value change to all clients.</summary>
+        public static void BroadcastSliderUpdate(string name, float value)
+        {
+            var msg = new SliderUpdateMessage
+            {
+                type = "sliderUpdate",
+                name = name,
+                value = value
+            };
+
+            Broadcast(ToJson(msg));
         }
 
         /// <summary>
@@ -184,6 +227,21 @@ namespace FairgroundAPI.Network
                         InteractionManager.ToggleMultyToggle(mtCmd.name);
                         break;
 
+                    case "setDropdown":
+                        var ddCmd = FromJson<IntCommand>(data);
+                        InteractionManager.SetDropdownValue(ddCmd.name, ddCmd.value);
+                        break;
+
+                    case "setSlider":
+                        var sliderCmd = FromJson<FloatCommand>(data);
+                        InteractionManager.SetSliderValue(sliderCmd.name, sliderCmd.value);
+                        break;
+
+                    case "pressPreset":
+                        var presetCmd = FromJson<IncomingCommand>(data);
+                        InteractionManager.PressPresetButton(presetCmd.name);
+                        break;
+
                     default:
                         Log.LogWarning($"[WebSocket] Unknown action: {action}");
                         break;
@@ -205,7 +263,6 @@ namespace FairgroundAPI.Network
 
                 list.Add(new LightData
                 {
-                    id = kvp.Key,
                     name = light.gameObject.name,
                     color = MaterialHelper.ExtractColorName(light),
                     mode = light.Light_Mode.ToString()
@@ -289,8 +346,7 @@ namespace FairgroundAPI.Network
 
                 list.Add(new StopButtonData
                 {
-                    name = kvp.Key,
-                    isDown = sb.Is_Down
+                    name = kvp.Key
                 });
             }
             return list.ToArray();
@@ -301,14 +357,86 @@ namespace FairgroundAPI.Network
             var list = new List<MultyToggleData>();
             foreach (var kvp in SessionManager.TrackedMultyToggles)
             {
-                var mt = kvp.Value;
-                if (mt.WasCollected) continue;
+                var sync = kvp.Value;
+                if (sync == null || sync.WasCollected) continue;
 
                 list.Add(new MultyToggleData
                 {
                     name = kvp.Key,
-                    value = mt.Value
+                    value = sync.Value
                 });
+            }
+            return list.ToArray();
+        }
+
+        private static DropdownData[] BuildDropdownData()
+        {
+            var list = new List<DropdownData>();
+            foreach (var kvp in SessionManager.TrackedDropdowns)
+            {
+                var sync = kvp.Value;
+                if (sync == null || sync.WasCollected || sync.Dropdown == null) continue;
+
+                var dd = sync.Dropdown;
+                var optionNames = new List<string>();
+                try
+                {
+                    var options = dd.options;
+                    if (options != null)
+                    {
+                        // IL2CPP: options is Il2CppSystem.Collections.Generic.List<TMP_Dropdown.OptionData>
+                        // Access the internal _items array
+                        var items = options._items;
+                        int count = options.Count;
+                        for (int i = 0; i < count; i++)
+                        {
+                            var opt = items[i];
+                            optionNames.Add(opt?.text ?? "");
+                        }
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Log.LogWarning($"[WebSocket] Failed to read dropdown options for '{kvp.Key}': {ex.Message}");
+                }
+
+                list.Add(new DropdownData
+                {
+                    name = kvp.Key,
+                    selectedIndex = sync.Value,
+                    options = optionNames.ToArray()
+                });
+            }
+            return list.ToArray();
+        }
+
+        private static SliderData[] BuildSliderData()
+        {
+            var list = new List<SliderData>();
+            foreach (var kvp in SessionManager.TrackedSliders)
+            {
+                var sync = kvp.Value;
+                if (sync == null || sync.WasCollected || sync.Slider == null) continue;
+
+                list.Add(new SliderData
+                {
+                    name = kvp.Key,
+                    min = sync.Slider.minValue,
+                    max = sync.Slider.maxValue,
+                    current = sync.Value
+                });
+            }
+            return list.ToArray();
+        }
+
+        private static PresetButtonData[] BuildPresetButtonData()
+        {
+            var list = new List<PresetButtonData>();
+            foreach (var kvp in SessionManager.TrackedPresetButtons)
+            {
+                var btn = kvp.Value;
+                if (btn == null || btn.WasCollected) continue;
+                list.Add(new PresetButtonData { name = kvp.Key });
             }
             return list.ToArray();
         }

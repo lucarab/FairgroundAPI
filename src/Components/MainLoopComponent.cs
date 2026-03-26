@@ -2,7 +2,9 @@ using System.Collections.Concurrent;
 using FairgroundAPI.Managers;
 using FairgroundAPI.Network;
 using FairgroundAPI.Utilities;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace FairgroundAPI.Components
 {
@@ -15,8 +17,10 @@ namespace FairgroundAPI.Components
         public static MainLoopComponent Instance { get; private set; }
         public MainLoopComponent(System.IntPtr ptr) : base(ptr) { }
 
-        private readonly Dictionary<int, string> _lastKnownModes = new();
-        private const float PollInterval = 0.25f;
+        private readonly Dictionary<string, string> _lastKnownModes = new();
+        private readonly Dictionary<string, int> _lastKnownMultyToggleStates = new();
+        private readonly Dictionary<string, int> _lastKnownDropdownValues = new();
+        private readonly Dictionary<string, float> _lastKnownSliderValues = new();
         private float _timer;
 
         private static readonly ConcurrentQueue<System.Action> _mainThreadQueue = new();
@@ -40,12 +44,25 @@ namespace FairgroundAPI.Components
         public void ClearCache()
         {
             _lastKnownModes.Clear();
+            _lastKnownMultyToggleStates.Clear();
+            _lastKnownDropdownValues.Clear();
+            _lastKnownSliderValues.Clear();
         }
 
         private void Update()
         {
             ProcessQueue();
+
+            if (!SessionManager.HasActiveSession) return;
+
+            _timer += Time.deltaTime;
+            if (_timer < Core.FairgroundPlugin.ConfigPollRate.Value) return;
+            _timer = 0f;
+
             PollLights();
+            PollMultyToggles();
+            PollDropdowns();
+            PollSliders();
         }
 
         private void ProcessQueue()
@@ -61,43 +78,84 @@ namespace FairgroundAPI.Components
         }
 
         /// <summary>
-        /// Checks all tracked lights for mode changes at a fixed interval
-        /// and broadcasts updates to connected clients.
+        /// Checks all tracked lights for mode changes and broadcasts updates to connected clients.
         /// </summary>
         private void PollLights()
         {
-            if (!SessionManager.HasActiveSession) return;
-
-            _timer += Time.deltaTime;
-            if (_timer < PollInterval) return;
-            _timer = 0f;
-
-            var snapshot = new List<KeyValuePair<int, State_Light>>(SessionManager.TrackedLights);
-
-            foreach (var kvp in snapshot)
+            foreach (var kvp in SessionManager.TrackedLights)
             {
                 State_Light light = kvp.Value;
                 if (light.WasCollected) continue;
 
                 string currentMode = light.Light_Mode.ToString();
 
-                if (!_lastKnownModes.TryGetValue(kvp.Key, out string lastMode))
+                if (!_lastKnownModes.TryGetValue(kvp.Key, out string lastMode) || lastMode != currentMode)
                 {
                     _lastKnownModes[kvp.Key] = currentMode;
-                    BroadcastLight(kvp.Key, light, currentMode);
-                }
-                else if (lastMode != currentMode)
-                {
-                    _lastKnownModes[kvp.Key] = currentMode;
-                    BroadcastLight(kvp.Key, light, currentMode);
+                    string color = MaterialHelper.ExtractColorName(light);
+                    WebSocketManager.BroadcastLightUpdate(light.gameObject.name, color, currentMode);
                 }
             }
         }
 
-        private void BroadcastLight(int id, State_Light light, string mode)
+        /// <summary>
+        /// Checks all tracked multy toggles for state changes and broadcasts updates to connected clients.
+        /// </summary>
+        private void PollMultyToggles()
         {
-            string color = MaterialHelper.ExtractColorName(light);
-            WebSocketManager.BroadcastLightUpdate(id, light.gameObject.name, color, mode);
+            foreach (var kvp in SessionManager.TrackedMultyToggles)
+            {
+                Multy_Toggle_Sync sync = kvp.Value;
+                if (sync == null || sync.WasCollected) continue;
+
+                int currentState = sync.Value;
+
+                if (!_lastKnownMultyToggleStates.TryGetValue(kvp.Key, out int lastState) || lastState != currentState)
+                {
+                    _lastKnownMultyToggleStates[kvp.Key] = currentState;
+                    WebSocketManager.BroadcastMultyToggleUpdate(kvp.Key, currentState);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks all tracked dropdowns for value changes and broadcasts updates to connected clients.
+        /// </summary>
+        private void PollDropdowns()
+        {
+            foreach (var kvp in SessionManager.TrackedDropdowns)
+            {
+                Dropdown_Sync sync = kvp.Value;
+                if (sync == null || sync.WasCollected) continue;
+
+                int currentValue = sync.Value;
+
+                if (!_lastKnownDropdownValues.TryGetValue(kvp.Key, out int lastValue) || lastValue != currentValue)
+                {
+                    _lastKnownDropdownValues[kvp.Key] = currentValue;
+                    WebSocketManager.BroadcastDropdownUpdate(kvp.Key, currentValue);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks all tracked sliders for value changes and broadcasts updates to connected clients.
+        /// </summary>
+        private void PollSliders()
+        {
+            foreach (var kvp in SessionManager.TrackedSliders)
+            {
+                Slider_Sync slider = kvp.Value;
+                if (slider == null || slider.WasCollected) continue;
+
+                float currentValue = slider.Value;
+
+                if (!_lastKnownSliderValues.TryGetValue(kvp.Key, out float lastValue) || lastValue != currentValue)
+                {
+                    _lastKnownSliderValues[kvp.Key] = currentValue;
+                    WebSocketManager.BroadcastSliderUpdate(kvp.Key, currentValue);
+                }
+            }
         }
     }
 }

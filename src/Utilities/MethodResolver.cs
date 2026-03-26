@@ -30,7 +30,7 @@ namespace FairgroundAPI.Utilities
         /// </summary>
         public static bool ResolveAll()
         {
-            Log.LogInfo("[Resolver] Starting obfuscated method resolution...");
+            Log.LogDebug("[Resolver] Starting obfuscated method resolution...");
 
             bool applyOk = ResolveApplyValue();
             bool stopBtnOk = ResolveStopButtonToggle();
@@ -38,7 +38,7 @@ namespace FairgroundAPI.Utilities
 
             IsResolved = applyOk && stopBtnOk && multyToggleOk;
 
-            Log.LogInfo(IsResolved
+            Log.LogDebug(IsResolved
                 ? "[Resolver] All methods resolved successfully."
                 : "[Resolver] FAILED to resolve some methods. Check logs.");
 

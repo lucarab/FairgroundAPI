@@ -47,6 +47,12 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>D:\Anwendungen\Steam\steamapps\common\Fairground Online\BepInEx\interop\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>D:\Anwendungen\Steam\steamapps\common\Fairground Online\BepInEx\interop\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>D:\Anwendungen\Steam\steamapps\common\Fairground Online\BepInEx\interop\Unity.TextMeshPro.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

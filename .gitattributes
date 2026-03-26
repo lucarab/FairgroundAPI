@@ -1,0 +1,2 @@
+# Ignore web and docs folder contents from GitHub language statistics
+web/** linguist-vendored

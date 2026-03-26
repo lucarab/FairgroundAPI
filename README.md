@@ -12,9 +12,10 @@ Welcome to the **FairgroundAPI**! This is a BepInEx / IL2CPP mod for the game [*
 
 ## ✨ Features
 
-- **Zero-Latency Control:** Press buttons, flip switches, turn potentiometers, and move joysticks remotely.
+- **Zero-Latency Control:** Press buttons, flip switches, turn potentiometers, move joysticks, toggle stop buttons, and switch multy toggles remotely.
 - **Bi-directional Sync:** The dashboard accurately reflects the real-time blinking state and colors of all the physical ride lights.
 - **Plug & Play Web Dashboard:** Comes with a fully responsive, dark-mode dashboard.
+- **Built-in Developer API Reference:** The web dashboard features a live, self-documenting API registry that displays exact JSON payloads and API names for every component on the current ride.
 
 ## 📦 Installation
 
@@ -25,11 +26,19 @@ _Note: You must have [BepInEx 6 Bleeding Edge (IL2CPP version)](https://builds.b
 3. Keep the `web` folder anywhere on your PC (or host it locally).
 4. Launch the game, walk up to a ride, take control, and then simply double-click `web/index.html` to open your control panel!
 
+## ⚙️ Configuration
+
+After running the game with the plugin installed for the first time, an auto-generated configuration file will appear at `BepInEx/config/com.invalidluca.fairground.api.cfg`. 
+You can edit this file to change:
+- **WebSocket Port**: Change the listening port (default: `8765`). If you change this, make sure to update the URL in your web dashboard.
+- **Poll Rate**: Adjust how frequently the API checks for ride state changes, like blinking lights (default: `0.5` seconds). Lower values mean faster light updates but consume more CPU usage.
+
 ## 📖 API Documentation
 
 Do you want to build your own custom dashboard, a Discord integration, or a physical hardware controller (like Arduino/ESP32)?
 
-We have fully documented the entire WebSocket interface (JSON payloads in and out).
+We have fully documented the entire WebSocket interface (JSON payloads in and out).  
+**Tip:** The included Web Dashboard (`web/index.html`) features a live **Developer API Reference** tab that automatically lists every single component on the ride you are currently controlling, complete with click-to-copy API names and JSON examples!
 
 👉 **[Read the API Documentation here](https://lucarab.github.io/FairgroundAPI/API.html)**
 

@@ -1,24 +1,29 @@
 using FairgroundAPI.Core;
 using FairgroundAPI.Network;
 using FairgroundAPI.Utilities;
+using TMPro;
+using UnityEngine.UI;
 
 namespace FairgroundAPI.Managers
 {
     /// <summary>
     /// Manages the current ride session, including tracking all discovered control panel
-    /// components (lights, buttons, switches, potentiometers, joysticks) and handling
+    /// components (lights, buttons, switches, potentiometers, joysticks, stop buttons, multy toggles, dropdowns) and handling
     /// ownership changes when the local player gains or loses control of a ride.
     /// </summary>
     public static class SessionManager
     {
         public static int ActiveRightsControllerId { get; private set; }
-        public static Dictionary<int, State_Light> TrackedLights { get; } = new();
+        public static Dictionary<string, State_Light> TrackedLights { get; } = new();
         public static Dictionary<string, Panel_Button> TrackedButtons { get; } = new();
         public static Dictionary<string, Rot_Switch> TrackedSwitches { get; } = new();
         public static Dictionary<string, Potentiometer> TrackedPotentiometers { get; } = new();
         public static Dictionary<string, Joystick> TrackedJoysticks { get; } = new();
         public static Dictionary<string, Stop_Button> TrackedStopButtons { get; } = new();
-        public static Dictionary<string, Multy_Toggle> TrackedMultyToggles { get; } = new();
+        public static Dictionary<string, Multy_Toggle_Sync> TrackedMultyToggles { get; } = new();
+        public static Dictionary<string, Dropdown_Sync> TrackedDropdowns { get; } = new();
+        public static Dictionary<string, Slider_Sync> TrackedSliders { get; } = new();
+        public static Dictionary<string, Button_Sync> TrackedPresetButtons { get; } = new();
 
         public static bool HasActiveSession => ActiveRightsControllerId != 0;
 
@@ -64,7 +69,8 @@ namespace FairgroundAPI.Managers
                 $"Scan complete: {TrackedLights.Count} Lights, {TrackedButtons.Count} Buttons, " +
                 $"{TrackedSwitches.Count} Switches, {TrackedPotentiometers.Count} Potentiometers, " +
                 $"{TrackedJoysticks.Count} Joysticks, {TrackedStopButtons.Count} StopButtons, " +
-                $"{TrackedMultyToggles.Count} MultyToggles."
+                $"{TrackedMultyToggles.Count} MultyToggles, {TrackedDropdowns.Count} Dropdowns, " +
+                $"{TrackedSliders.Count} Sliders, {TrackedPresetButtons.Count} PresetButtons."
             );
         }
 
@@ -81,6 +87,9 @@ namespace FairgroundAPI.Managers
             TrackedJoysticks.Clear();
             TrackedStopButtons.Clear();
             TrackedMultyToggles.Clear();
+            TrackedDropdowns.Clear();
+            TrackedSliders.Clear();
+            TrackedPresetButtons.Clear();
             Components.MainLoopComponent.Instance?.ClearCache();
             FairgroundPlugin.Log.LogInfo("Session cleared.");
         }

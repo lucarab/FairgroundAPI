@@ -1,6 +1,9 @@
 using BepInEx.Logging;
 using FairgroundAPI.Core;
 using FairgroundAPI.Utilities;
+using TMPro;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 namespace FairgroundAPI.Managers
 {
@@ -117,17 +120,82 @@ namespace FairgroundAPI.Managers
         {
             if (!EnsureReady()) return;
 
-            if (!SessionManager.TrackedMultyToggles.TryGetValue(name, out Multy_Toggle multyToggle))
+            if (!SessionManager.TrackedMultyToggles.TryGetValue(name, out Multy_Toggle_Sync sync))
             {
                 Log.LogWarning($"MultyToggle '{name}' not found on this console.");
                 return;
             }
 
-            if (multyToggle.WasCollected) return;
+            if (sync == null || sync.WasCollected || sync.Multy_Toggle == null) return;
 
-            MethodResolver.InvokeMultyToggleState(multyToggle);
-            // Current value is typically 1 (on) or 0 (off), though the invoke toggles it
-            Log.LogDebug($"[Command] MultyToggle TOGGLED -> {name} (Value: {multyToggle.Value})");
+            MethodResolver.InvokeMultyToggleState(sync.Multy_Toggle);
+            Log.LogDebug($"[Command] MultyToggle TOGGLED -> {name} (Value: {sync.Value})");
+        }
+
+        /// <summary>Sets a dropdown to the specified index.</summary>
+        public static void SetDropdownValue(string name, int index)
+        {
+            if (!EnsureReady()) return;
+
+            if (!SessionManager.TrackedDropdowns.TryGetValue(name, out Dropdown_Sync sync))
+            {
+                Log.LogWarning($"Dropdown '{name}' not found on this console.");
+                return;
+            }
+
+            if (sync == null || sync.WasCollected || sync.Dropdown == null) return;
+
+            int optionCount = 0;
+            try { optionCount = sync.Dropdown.options?.Count ?? 0; } catch { }
+
+            if (index < 0 || index >= optionCount)
+            {
+                Log.LogWarning($"Index {index} for Dropdown '{name}' out of range. Allowed: 0–{optionCount - 1}.");
+                return;
+            }
+
+            sync.ger(index);
+            Log.LogDebug($"[Command] Dropdown SET to {index} -> {name}");
+        }
+
+        /// <summary>Sets a slider to the specified float value.</summary>
+        public static void SetSliderValue(string name, float value)
+        {
+            if (!EnsureReady()) return;
+
+            if (!SessionManager.TrackedSliders.TryGetValue(name, out Slider_Sync sync))
+            {
+                Log.LogWarning($"Slider '{name}' not found on this console.");
+                return;
+            }
+
+            if (sync == null || sync.WasCollected || sync.Slider == null) return;
+
+            if (value < sync.Slider.minValue || value > sync.Slider.maxValue)
+            {
+                Log.LogWarning($"Value {value} for Slider '{name}' out of range. Allowed: {sync.Slider.minValue}–{sync.Slider.maxValue}.");
+                return;
+            }
+
+            sync.gee(value);
+            Log.LogDebug($"[Command] Slider SET to {value} -> {name}");
+        }
+
+        /// <summary>Presses a preset button via Button_Sync.OnPointerDown.</summary>
+        public static void PressPresetButton(string name)
+        {
+            if (!EnsureReady()) return;
+
+            if (!SessionManager.TrackedPresetButtons.TryGetValue(name, out Button_Sync btnSync))
+            {
+                Log.LogWarning($"PresetButton '{name}' not found on this console.");
+                return;
+            }
+
+            if (btnSync == null || btnSync.WasCollected) return;
+
+            btnSync.OnPointerDown(new PointerEventData(null));
+            Log.LogDebug($"[Command] PresetButton PRESSED -> {name}");
         }
 
         private static bool EnsureReady()

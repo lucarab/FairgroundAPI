@@ -7,34 +7,47 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-primary: #0b0f19;
-            --bg-secondary: #111827;
-            --bg-card: #151c2c;
-            --bg-card-hover: #1a2235;
-            --bg-input: #0d1221;
-            --border-color: rgba(56, 72, 100, 0.5);
-            --border-active: rgba(59, 130, 246, 0.5);
-            --text-primary: #e2e8f0;
-            --text-secondary: #7a8ba8;
-            --text-muted: #4a5568;
-            --accent-blue: #3b82f6;
-            --accent-green: #22c55e;
-            --accent-red: #ef4444;
-            --accent-yellow: #eab308;
-            --accent-orange: #f97316;
-            --accent-cyan: #06b6d4;
-            --accent-purple: #a855f7;
-            --tab-active: #3b82f6;
+            --bg-primary: #080c14;
+            --bg-secondary: #0d1320;
+            --bg-card: rgba(17, 25, 40, 0.75);
+            --bg-card-hover: rgba(23, 33, 52, 0.85);
+            --bg-input: rgba(8, 14, 27, 0.8);
+            --border-color: rgba(99, 115, 146, 0.18);
+            --border-active: rgba(99, 102, 241, 0.5);
+            --text-primary: #e8edf5;
+            --text-secondary: #8896b0;
+            --text-muted: #4e5d75;
+            --accent-blue: #6366f1;
+            --accent-green: #10b981;
+            --accent-red: #f43f5e;
+            --accent-yellow: #f59e0b;
+            --accent-orange: #fb923c;
+            --accent-cyan: #22d3ee;
+            --accent-purple: #a78bfa;
+            --tab-active: #6366f1;
+            --glass-bg: rgba(15, 23, 42, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Inter', sans-serif;
-            background: radial-gradient(circle at top center, #111827 0%, #0b0f19 100%);
-            background-attachment: fixed;
+            background: #080c14;
             color: var(--text-primary);
             min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background accent */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(99, 102, 241, 0.03);
+            pointer-events: none;
+            z-index: 0;
         }
 
         /* ── Global Scrollbar ────────────────────────── */
@@ -48,17 +61,41 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 14px 24px;
-            background: #0e1525;
-            border-bottom: 1px solid var(--border-color);
+            padding: 16px 28px;
+            background: rgba(10, 15, 28, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(99, 102, 241, 0.25);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            font-size: 22px;
+            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.4));
         }
 
         .header-title {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 800;
-            letter-spacing: 1px;
+            letter-spacing: 2px;
             text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
         .header-title span {
@@ -71,25 +108,28 @@
             gap: 8px;
             padding: 6px 16px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
         }
 
         .status-badge.connected {
-            background: rgba(34, 197, 94, 0.12);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--accent-green);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid rgba(16, 185, 129, 0.25);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.08);
         }
 
         .status-badge.disconnected {
-            background: rgba(239, 68, 68, 0.12);
+            background: rgba(244, 63, 94, 0.1);
             color: var(--accent-red);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(244, 63, 94, 0.25);
         }
 
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: currentColor;
         }
@@ -99,8 +139,8 @@
         }
 
         @keyframes pulse {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
-            50% { box-shadow: 0 0 0 5px rgba(34, 197, 94, 0); }
+            0%, 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
         }
 
         /* ── Connection Bar ──────────────────────────── */
@@ -108,55 +148,68 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 12px 24px;
-            background: var(--bg-secondary);
-            border-bottom: 1px solid var(--border-color);
+            padding: 12px 28px;
+            background: rgba(13, 19, 32, 0.7);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            position: relative;
+            z-index: 5;
         }
 
         .connection-bar label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-secondary);
             white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
         }
 
         .connection-bar input {
             flex: 1;
-            max-width: 300px;
-            padding: 7px 12px;
+            max-width: 320px;
+            padding: 8px 14px;
             background: var(--bg-input);
             border: 1px solid var(--border-color);
-            border-radius: 6px;
+            border-radius: 8px;
             color: var(--text-primary);
             font-family: 'JetBrains Mono', monospace;
             font-size: 12px;
             outline: none;
+            transition: all 0.2s;
         }
 
         .connection-bar input:focus {
             border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
         }
 
         .btn-reconnect {
-            padding: 7px 18px;
-            background: rgba(59, 130, 246, 0.15);
-            border: 1px solid rgba(59, 130, 246, 0.4);
-            border-radius: 6px;
+            padding: 8px 20px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
             color: var(--accent-blue);
             font-family: 'Inter', sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .btn-reconnect:hover {
-            background: rgba(59, 130, 246, 0.25);
+            background: rgba(99, 102, 241, 0.2);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+            transform: translateY(-1px);
         }
 
         /* ── Main Layout ─────────────────────────────── */
         .main {
-            padding: 20px 24px;
+            padding: 24px 28px;
+            position: relative;
+            z-index: 1;
         }
 
         /* ── Lights Section ───────────────────────────── */
@@ -183,27 +236,28 @@
 
         .lamp-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 10px;
             margin-bottom: 28px;
         }
 
         .lamp-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
             padding: 12px 14px;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 10px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .lamp-card:hover {
-            border-color: rgba(75, 85, 99, 0.8);
+            border-color: rgba(99, 102, 241, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.1);
         }
 
         .lamp-info {
@@ -234,14 +288,14 @@
             transition: all 0.3s;
         }
 
-        .lamp-dot.off { background: #374151; }
-        .lamp-dot.green { background: var(--accent-green); box-shadow: 0 0 12px rgba(34,197,94,0.5); }
-        .lamp-dot.red { background: var(--accent-red); box-shadow: 0 0 12px rgba(239,68,68,0.5); }
-        .lamp-dot.yellow { background: var(--accent-yellow); box-shadow: 0 0 12px rgba(234,179,8,0.5); }
-        .lamp-dot.blue { background: var(--accent-blue); box-shadow: 0 0 12px rgba(59,130,246,0.5); }
-        .lamp-dot.orange { background: var(--accent-orange); box-shadow: 0 0 12px rgba(249,115,22,0.5); }
-        .lamp-dot.purple { background: var(--accent-purple); box-shadow: 0 0 12px rgba(168,85,247,0.5); }
-        .lamp-dot.white { background: #e5e7eb; box-shadow: 0 0 12px rgba(229,231,235,0.4); }
+        .lamp-dot.off { background: #2d3748; box-shadow: none; }
+        .lamp-dot.green { background: var(--accent-green); box-shadow: 0 0 14px rgba(16,185,129,0.5), 0 0 4px rgba(16,185,129,0.3); }
+        .lamp-dot.red { background: var(--accent-red); box-shadow: 0 0 14px rgba(244,63,94,0.5), 0 0 4px rgba(244,63,94,0.3); }
+        .lamp-dot.yellow { background: var(--accent-yellow); box-shadow: 0 0 14px rgba(245,158,11,0.5), 0 0 4px rgba(245,158,11,0.3); }
+        .lamp-dot.blue { background: var(--accent-blue); box-shadow: 0 0 14px rgba(99,102,241,0.5), 0 0 4px rgba(99,102,241,0.3); }
+        .lamp-dot.orange { background: var(--accent-orange); box-shadow: 0 0 14px rgba(251,146,60,0.5), 0 0 4px rgba(251,146,60,0.3); }
+        .lamp-dot.purple { background: var(--accent-purple); box-shadow: 0 0 14px rgba(167,139,250,0.5), 0 0 4px rgba(167,139,250,0.3); }
+        .lamp-dot.white { background: #e5e7eb; box-shadow: 0 0 14px rgba(229,231,235,0.4), 0 0 4px rgba(229,231,235,0.2); }
 
         /* Strobe = normal speed */
         .lamp-dot.strobe { animation: blink 1s infinite; }
@@ -259,15 +313,16 @@
 
         .tab-bar {
             display: flex;
-            gap: 0;
-            border-bottom: 2px solid var(--border-color);
+            gap: 2px;
+            border-bottom: 1px solid var(--glass-border);
             margin-bottom: 0;
+            padding: 0 4px;
         }
 
         .tab-btn {
-            padding: 10px 22px;
+            padding: 11px 20px;
             font-family: 'Inter', sans-serif;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: var(--text-muted);
             background: none;
@@ -276,7 +331,7 @@
             position: relative;
             transition: color 0.2s;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.8px;
         }
 
         .tab-btn:hover { color: var(--text-secondary); }
@@ -288,11 +343,12 @@
         .tab-btn.active::after {
             content: '';
             position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
+            bottom: -1px;
+            left: 8px;
+            right: 8px;
             height: 2px;
             background: var(--accent-blue);
+            border-radius: 2px 2px 0 0;
         }
 
         .tab-btn .tab-count {
@@ -300,23 +356,25 @@
             margin-left: 6px;
             padding: 1px 7px;
             border-radius: 10px;
-            background: rgba(75, 85, 99, 0.3);
+            background: rgba(75, 85, 99, 0.2);
             font-size: 10px;
             font-weight: 600;
         }
 
         .tab-btn.active .tab-count {
-            background: rgba(59, 130, 246, 0.2);
+            background: rgba(99, 102, 241, 0.15);
             color: var(--accent-blue);
         }
 
         .tab-content {
             display: none;
-            border: 1px dashed var(--border-color);
+            border: 1px solid var(--glass-border);
             border-top: none;
-            border-radius: 0 0 8px 8px;
-            padding: 16px;
+            border-radius: 0 0 10px 10px;
+            padding: 18px;
             min-height: 120px;
+            background: rgba(13, 19, 32, 0.4);
+            backdrop-filter: blur(8px);
         }
 
         .tab-content.active { display: block; }
@@ -337,16 +395,17 @@
 
         .control-card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
             padding: 14px;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .control-card:hover {
-            border-color: rgba(75, 85, 99, 0.8);
+            border-color: rgba(99, 102, 241, 0.2);
             transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(99, 102, 241, 0.1);
         }
 
         .control-card .ctrl-name {
@@ -354,6 +413,10 @@
             font-weight: 600;
             margin-bottom: 10px;
             color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
         }
 
         .control-card .ctrl-meta {
@@ -365,31 +428,31 @@
         /* Button controls */
         .btn-press {
             padding: 8px 20px;
-            border-radius: 6px;
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            background: rgba(34, 197, 94, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            background: rgba(16, 185, 129, 0.1);
             color: var(--accent-green);
             font-family: 'Inter', sans-serif;
             font-size: 11px;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.1s;
+            transition: all 0.12s;
             user-select: none;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 0 rgba(34, 197, 94, 0.3);
-            margin-bottom: 4px; /* Space for the shadow */
+            box-shadow: 0 4px 0 rgba(16, 185, 129, 0.25);
+            margin-bottom: 4px;
         }
 
         .btn-press:hover { 
-            background: rgba(34,197,94,0.15); 
-            box-shadow: 0 4px 0 rgba(34, 197, 94, 0.4); 
+            background: rgba(16, 185, 129, 0.15);
+            box-shadow: 0 4px 0 rgba(16, 185, 129, 0.35); 
         }
         
         .btn-press:active, .btn-press.active { 
             transform: translateY(4px); 
-            box-shadow: 0 0 0 rgba(34, 197, 94, 0); 
-            background: rgba(34,197,94,0.3); 
+            box-shadow: 0 0 0 rgba(16, 185, 129, 0); 
+            background: rgba(16, 185, 129, 0.3); 
         }
 
         /* Stop Button controls */
@@ -494,6 +557,100 @@
             background: rgba(139, 92, 246, 0.12);
         }
 
+        /* Dropdown controls */
+        .dropdown-select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            background: var(--bg-input);
+            color: var(--accent-cyan);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2306b6d4' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+            transition: all 0.15s;
+        }
+
+        .dropdown-select:hover {
+            border-color: rgba(6, 182, 212, 0.6);
+            background-color: rgba(6, 182, 212, 0.05);
+        }
+
+        .dropdown-select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15);
+        }
+
+        .dropdown-select option {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+
+        .dropdown-index {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 8px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.12);
+        }
+
+        /* Preset buttons */
+        .btn-preset {
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: 1px solid rgba(251, 146, 60, 0.4);
+            background: rgba(251, 146, 60, 0.1);
+            color: #fdba74;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            user-select: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 rgba(251, 146, 60, 0.3);
+            margin-bottom: 4px;
+        }
+
+        .btn-preset:hover {
+            background: rgba(251, 146, 60, 0.15);
+            box-shadow: 0 4px 0 rgba(251, 146, 60, 0.4);
+        }
+
+        .btn-preset:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 rgba(251, 146, 60, 0);
+            background: rgba(251, 146, 60, 0.35);
+            border-color: rgba(251, 146, 60, 0.7);
+            color: #fed7aa;
+        }
+
+        .dev-table { width: 100%; border-collapse: collapse; margin-top: 10px; font-family: monospace; font-size: 13px; color: #d1d5db; }
+        .dev-table th, .dev-table td { border: 1px solid rgba(255,255,255,0.05); padding: 10px; text-align: left; }
+        .dev-table th { background: rgba(0,0,0,0.3); color: #ffd166; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .dev-table tr:hover { background: rgba(255,255,255,0.05); }
+        .dev-table .copy-btn { margin-left: auto; padding: 2px 8px; border-radius: 4px; background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.4); cursor: pointer; font-size: 10px; font-family: sans-serif; transition: all 0.2s; }
+        .dev-table .copy-btn:hover { background: rgba(59, 130, 246, 0.4); color: #fff; }
+        .dev-name { color: #a78bfa; font-weight: bold; }
+        .dev-details { color: #9ca3af; font-size: 11px; }
+        .dev-code { display: block; background: rgba(0,0,0,0.4); padding: 6px; border-radius: 4px; color: #6ee7b7; font-size: 11px; white-space: pre-wrap; word-break: break-all; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .dev-title { color: #ffd166; margin-bottom: 10px; font-size: 1.2rem; }
+        .dev-intro { color: #9ca3af; margin-bottom: 20px; line-height: 1.6; }
+        .dev-intro code { background: rgba(0,0,0,0.3); padding: 2px 5px; border-radius: 3px; color: #6ee7b7; }
+        .group-title { font-size: 1.2rem; font-weight: 600; color: #ffd166; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+
         /* Switch buttons */
         .switch-row {
             display: flex;
@@ -596,7 +753,7 @@
             width: 180px;
             height: 180px;
             border-radius: 12px;
-            background: radial-gradient(circle at center, #1e263c 0%, #0d1221 100%);
+            background: #141c2e;
             border: 1px solid var(--border-color);
             position: relative;
             cursor: grab;
@@ -681,8 +838,9 @@
 
         .console-panel {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
             overflow: hidden;
         }
 
@@ -691,8 +849,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 10px 14px;
-            border-bottom: 1px solid var(--border-color);
-            background: rgba(15, 23, 42, 0.6);
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(10, 15, 28, 0.5);
         }
 
         .console-header h3 {
@@ -774,32 +932,69 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            min-height: 50vh;
-            gap: 12px;
+            min-height: 55vh;
+            gap: 14px;
             text-align: center;
+            position: relative;
+        }
+
+        #no-session .icon-rings {
+            position: relative;
+            margin-bottom: 4px;
         }
 
         #no-session .icon-big {
-            font-size: 48px;
-            margin-bottom: 8px;
+            font-size: 52px;
             animation: float 3s ease-in-out infinite;
-            filter: drop-shadow(0 0 16px rgba(59, 130, 246, 0.4));
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.4));
+            position: relative;
+            z-index: 1;
+        }
+
+        #no-session .icon-rings::before,
+        #no-session .icon-rings::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            animation: ringExpand 3s ease-in-out infinite;
+        }
+
+        #no-session .icon-rings::before {
+            width: 80px;
+            height: 80px;
+        }
+
+        #no-session .icon-rings::after {
+            width: 120px;
+            height: 120px;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes ringExpand {
+            0%, 100% { opacity: 0.3; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.1; transform: translate(-50%, -50%) scale(1.15); }
         }
 
         @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
         }
 
         #no-session h2 {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 700;
+            color: var(--text-primary);
         }
 
         #no-session p {
             color: var(--text-secondary);
             font-size: 13px;
             max-width: 380px;
+            line-height: 1.6;
         }
 
         #dashboard { display: none; }
@@ -808,6 +1003,9 @@
         @media (max-width: 768px) {
             .console-row { grid-template-columns: 1fr; }
             .lamp-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+            .header { padding: 14px 16px; }
+            .connection-bar { padding: 10px 16px; flex-wrap: wrap; }
+            .main { padding: 16px; }
         }
 
         /* Fade in */
@@ -822,7 +1020,10 @@
 
 <!-- Header -->
 <div class="header">
-    <div class="header-title">FAIRGROUND <span>API</span></div>
+    <div class="header-left">
+        <span class="header-icon">🎡</span>
+        <div class="header-title">FAIRGROUND <span>API</span></div>
+    </div>
     <div class="status-badge disconnected" id="statusBadge">
         <span class="status-dot"></span>
         <span id="statusText">Disconnected</span>
@@ -841,7 +1042,9 @@
 
     <!-- No Session -->
     <div id="no-session">
-        <div class="icon-big">🎡</div>
+        <div class="icon-rings">
+            <div class="icon-big">🎡</div>
+        </div>
         <h2>No Active Session</h2>
         <p>Connect to a ride's control panel in-game to see the dashboard here.</p>
     </div>
@@ -889,8 +1092,25 @@
     let reconnectTimer = null;
     let lightStates = {};
 
+    // Cached DOM references
+    const $wsUrlInput = document.getElementById('wsUrlInput');
+    const $statusBadge = document.getElementById('statusBadge');
+    const $statusText = document.getElementById('statusText');
+    const $noSession = document.getElementById('no-session');
+    const $dashboard = document.getElementById('dashboard');
+    const $lampsSection = document.getElementById('lampsSection');
+    const $lampsGrid = document.getElementById('lampsGrid');
+    const $lampsCount = document.getElementById('lampsCount');
+    const $tabsContainer = document.getElementById('tabsContainer');
+    const $tabBar = document.getElementById('tabBar');
+    const $tabPanels = document.getElementById('tabPanels');
+    const $liveConsole = document.getElementById('liveConsole');
+    const $jsonConsole = document.getElementById('jsonConsole');
+
+    function safeId(name) { return btoa(name).replace(/=/g, ''); }
+
     function getWsUrl() {
-        return document.getElementById('wsUrlInput').value.trim();
+        return $wsUrlInput.value.trim();
     }
 
     // ── WebSocket ────────────────────────────────────
@@ -942,10 +1162,8 @@
     }
 
     function setStatus(connected) {
-        const badge = document.getElementById('statusBadge');
-        const text = document.getElementById('statusText');
-        badge.className = 'status-badge ' + (connected ? 'connected' : 'disconnected');
-        text.textContent = connected ? 'Connected' : 'Disconnected';
+        $statusBadge.className = 'status-badge ' + (connected ? 'connected' : 'disconnected');
+        $statusText.textContent = connected ? 'Connected' : 'Disconnected';
     }
 
     // ── Message Handler ─────────────────────────────
@@ -958,6 +1176,21 @@
                 updateLight(msg);
                 logConsole(`<span class="highlight">${msg.name}</span> changed to <span class="value-change">${msg.mode}</span>`);
                 break;
+            case 'stopButtonUpdate':
+                // Stop buttons are stateless now
+                break;
+            case 'multyToggleUpdate':
+                updateMultyToggle(msg);
+                logConsole(`MultyToggle <span class="highlight">${msg.name}</span> is now <span class="value-change">${msg.value === 1 ? 'ON' : 'OFF'}</span>`);
+                break;
+            case 'dropdownUpdate':
+                updateDropdown(msg);
+                logConsole(`Dropdown <span class="highlight">${msg.name}</span> changed to index <span class="value-change">${msg.selectedIndex}</span>`);
+                break;
+            case 'sliderUpdate':
+                updateSlider(msg);
+                logConsole(`Slider <span class="highlight">${msg.name}</span> changed to <span class="value-change">${msg.value.toFixed(2)}</span>`);
+                break;
             case 'session':
                 if (!msg.active) {
                     showNoSession();
@@ -968,8 +1201,8 @@
     }
 
     function showNoSession() {
-        document.getElementById('no-session').style.display = 'flex';
-        document.getElementById('dashboard').style.display = 'none';
+        $noSession.style.display = 'flex';
+        $dashboard.style.display = 'none';
     }
 
     // ── Console Logging ─────────────────────────────
@@ -979,27 +1212,24 @@
     }
 
     function logConsole(text) {
-        const el = document.getElementById('liveConsole');
         const line = document.createElement('div');
         line.className = 'log-line';
         line.innerHTML = `<span class="timestamp">${getTimestamp()}</span> ${text}`;
-        el.appendChild(line);
-        el.scrollTop = el.scrollHeight;
-        // Keep max 200 lines
-        while (el.children.length > 200) el.removeChild(el.firstChild);
+        $liveConsole.appendChild(line);
+        $liveConsole.scrollTop = $liveConsole.scrollHeight;
+        while ($liveConsole.children.length > 200) $liveConsole.removeChild($liveConsole.firstChild);
     }
 
     function logJson(raw, direction) {
-        const el = document.getElementById('jsonConsole');
         const line = document.createElement('div');
         const isOut = direction === 'out';
         line.className = 'json-line ' + (isOut ? 'outgoing' : 'incoming');
         const arrow = isOut ? '▲' : '▼';
         const short = raw.length > 300 ? raw.substring(0, 300) + '…' : raw;
         line.innerHTML = `<span class="timestamp">${getTimestamp()}</span> <span class="direction">${arrow}</span>${escapeHtml(short)}`;
-        el.appendChild(line);
-        el.scrollTop = el.scrollHeight;
-        while (el.children.length > 100) el.removeChild(el.firstChild);
+        $jsonConsole.appendChild(line);
+        $jsonConsole.scrollTop = $jsonConsole.scrollHeight;
+        while ($jsonConsole.children.length > 100) $jsonConsole.removeChild($jsonConsole.firstChild);
     }
 
     function clearConsole(id) {
@@ -1012,31 +1242,28 @@
 
     // ── Render Full State ───────────────────────────
     function renderFullState(state) {
-        document.getElementById('no-session').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        $noSession.style.display = 'none';
+        $dashboard.style.display = 'block';
 
         renderLamps(state.lights || []);
-        renderTabs(state.buttons || [], state.switches || [], state.potentiometers || [], state.joysticks || [], state.stopButtons || [], state.multyToggles || []);
+        renderTabs(state.buttons || [], state.switches || [], state.potentiometers || [], state.joysticks || [], state.stopButtons || [], state.multyToggles || [], state.dropdowns || [], state.sliders || [], state.presetButtons || [], state.lights || []);
         logConsole('Full state received.');
     }
 
     // ── Lamps ───────────────────────────────────────
     function renderLamps(lights) {
-        const section = document.getElementById('lampsSection');
-        const grid = document.getElementById('lampsGrid');
-        const count = document.getElementById('lampsCount');
-
-        if (lights.length === 0) { section.style.display = 'none'; return; }
-        section.style.display = 'block';
-        count.textContent = lights.length + ' detected';
-        grid.innerHTML = '';
+        if (lights.length === 0) { $lampsSection.style.display = 'none'; return; }
+        $lampsSection.style.display = 'block';
+        $lampsCount.textContent = lights.length + ' detected';
+        $lampsGrid.innerHTML = '';
 
         lights.forEach((l, i) => {
-            lightStates[l.id] = l;
+            lightStates[l.name] = l;
+            const sid = safeId(l.name);
             const card = document.createElement('div');
             card.className = 'lamp-card fade-in';
             card.style.animationDelay = (i * 20) + 'ms';
-            card.id = 'lamp-' + l.id;
+            card.id = 'lamp-' + sid;
 
             const info = document.createElement('div');
             info.className = 'lamp-info';
@@ -1048,7 +1275,7 @@
 
             const state = document.createElement('div');
             state.className = 'lamp-state';
-            state.id = 'lamp-state-' + l.id;
+            state.id = 'lamp-state-' + sid;
             state.textContent = 'State: ' + l.mode;
 
             info.appendChild(name);
@@ -1056,18 +1283,19 @@
 
             const dot = document.createElement('div');
             dot.className = 'lamp-dot ' + getDotClass(l.color, l.mode);
-            dot.id = 'lamp-dot-' + l.id;
+            dot.id = 'lamp-dot-' + sid;
 
             card.appendChild(info);
             card.appendChild(dot);
-            grid.appendChild(card);
+            $lampsGrid.appendChild(card);
         });
     }
 
     function updateLight(l) {
-        lightStates[l.id] = l;
-        const dot = document.getElementById('lamp-dot-' + l.id);
-        const state = document.getElementById('lamp-state-' + l.id);
+        lightStates[l.name] = l;
+        const sid = safeId(l.name);
+        const dot = document.getElementById('lamp-dot-' + sid);
+        const state = document.getElementById('lamp-state-' + sid);
         if (dot) dot.className = 'lamp-dot ' + getDotClass(l.color, l.mode);
         if (state) state.textContent = 'State: ' + l.mode;
     }
@@ -1100,73 +1328,239 @@
     // ── Tabs ────────────────────────────────────────
     let currentTab = 'buttons';
 
-    function renderTabs(buttons, switches, pots, joysticks, stopButtons, multyToggles) {
-        const container = document.getElementById('tabsContainer');
-        const bar = document.getElementById('tabBar');
-        const panels = document.getElementById('tabPanels');
-
+    function renderTabs(buttons, switches, pots, joysticks, stopButtons, multyToggles, dropdowns, sliders, presetButtons, lights) {
         const tabs = [];
-        if (buttons.length > 0) tabs.push({ id: 'buttons', label: 'Panel Buttons', count: buttons.length });
-        if (stopButtons.length > 0) tabs.push({ id: 'stopButtons', label: 'Stop Buttons', count: stopButtons.length });
-        if (multyToggles.length > 0) tabs.push({ id: 'multyToggles', label: 'Multy Toggles', count: multyToggles.length });
+        const combinedButtons = buttons.length + stopButtons.length;
+        if (combinedButtons > 0) tabs.push({ id: 'buttons', label: 'Panel Buttons', count: combinedButtons });
         if (switches.length > 0) tabs.push({ id: 'switches', label: 'Rotary Switches', count: switches.length });
         if (pots.length > 0) tabs.push({ id: 'pots', label: 'Potentiometers', count: pots.length });
         if (joysticks.length > 0) tabs.push({ id: 'joysticks', label: 'Joysticks', count: joysticks.length });
 
-        if (tabs.length === 0) { container.style.display = 'none'; return; }
-        container.style.display = 'block';
+        const screenItemsCount = presetButtons.length + multyToggles.length + dropdowns.length + sliders.length;
+        if (screenItemsCount > 0) tabs.push({ id: 'screen', label: 'Screen Displays', count: screenItemsCount });
 
-        // If current tab doesn't exist, pick first
+        const totalItemsCount = combinedButtons + switches.length + pots.length + joysticks.length + screenItemsCount + lights.length;
+        if (totalItemsCount > 0) tabs.push({ id: 'developer', label: 'Developer API Reference', count: totalItemsCount });
+
+        if (tabs.length === 0) { $tabsContainer.style.display = 'none'; return; }
+        $tabsContainer.style.display = 'block';
+
         if (!tabs.find(t => t.id === currentTab)) currentTab = tabs[0].id;
 
-        // Render tab bar
-        bar.innerHTML = '';
+        $tabBar.innerHTML = '';
         tabs.forEach(t => {
             const btn = document.createElement('button');
             btn.className = 'tab-btn' + (t.id === currentTab ? ' active' : '');
             btn.innerHTML = `${t.label} <span class="tab-count">${t.count}</span>`;
             btn.onclick = () => switchTab(t.id);
-            bar.appendChild(btn);
+            $tabBar.appendChild(btn);
         });
 
-        // Render tab panels
-        panels.innerHTML = '';
+        $tabPanels.innerHTML = '';
 
-        if (buttons.length > 0) {
+        if (combinedButtons > 0) {
             const panel = createPanel('buttons');
-            renderButtonCards(panel, buttons);
-            panels.appendChild(panel);
+            const grid = document.createElement('div');
+            grid.className = 'controls-grid';
+            buttons.forEach(b => grid.appendChild(createButtonCard(b)));
+            stopButtons.forEach(sb => grid.appendChild(createStopButtonCard(sb)));
+            panel.appendChild(grid);
+            $tabPanels.appendChild(panel);
         }
 
         if (switches.length > 0) {
             const panel = createPanel('switches');
             renderSwitchCards(panel, switches);
-            panels.appendChild(panel);
+            $tabPanels.appendChild(panel);
         }
 
         if (pots.length > 0) {
             const panel = createPanel('pots');
             renderPotCards(panel, pots);
-            panels.appendChild(panel);
+            $tabPanels.appendChild(panel);
         }
 
         if (joysticks.length > 0) {
             const panel = createPanel('joysticks');
             renderJoystickCards(panel, joysticks);
-            panels.appendChild(panel);
+            $tabPanels.appendChild(panel);
         }
 
-        if (stopButtons.length > 0) {
-            const panel = createPanel('stopButtons');
-            renderStopButtonCards(panel, stopButtons);
-            panels.appendChild(panel);
+        if (screenItemsCount > 0) {
+            const panel = createPanel('screen');
+            renderScreenControlsGrouped(panel, presetButtons, multyToggles, dropdowns, sliders);
+            $tabPanels.appendChild(panel);
         }
 
-        if (multyToggles.length > 0) {
-            const panel = createPanel('multyToggles');
-            renderMultyToggleCards(panel, multyToggles);
-            panels.appendChild(panel);
+        if (totalItemsCount > 0) {
+            const panel = createPanel('developer');
+            renderDeveloperTab(panel, buttons, switches, pots, joysticks, stopButtons, multyToggles, dropdowns, sliders, presetButtons, lights);
+            $tabPanels.appendChild(panel);
         }
+    }
+
+    function renderDeveloperTab(container, buttons, switches, pots, joysticks, stopButtons, multyToggles, dropdowns, sliders, presetButtons, lights) {
+        const title = document.createElement('h2');
+        title.className = 'dev-title';
+        title.textContent = 'API Registry for Developers';
+        container.appendChild(title);
+
+        const desc = document.createElement('div');
+        desc.className = 'dev-intro';
+        desc.innerHTML = `
+            <p style="margin-top:0;">Welcome to the live, self-documenting API registry. It automatically discovers every component on the specific ride you're currently controlling.</p>
+            <p><strong>Connection:</strong> Connect your custom code/hardware to the WebSocket API at <code>ws://127.0.0.1:8765/api</code> (Port is configurable in the BepInEx config).</p>
+            <p><strong>Receiving Events:</strong> Upon connection, the server sends a full JSON layout. Real-time updates push as: <code>{"action":"update","name":"Exact_API_Name","value":...}</code>.</p>
+            <p style="margin-bottom:0;"><strong>Sending Commands:</strong> Below are the exact API names, parameter limits, and copy-paste ready block payloads you need to interact with this particular ride.</p>
+        `;
+        container.appendChild(desc);
+
+        // ── Filter bar ──
+        const filterBar = document.createElement('div');
+        filterBar.style.display = 'flex';
+        filterBar.style.alignItems = 'center';
+        filterBar.style.gap = '10px';
+        filterBar.style.marginBottom = '12px';
+
+        const filterLabel = document.createElement('label');
+        filterLabel.textContent = 'Filter by type:';
+        filterLabel.style.fontSize = '12px';
+        filterLabel.style.fontWeight = '600';
+        filterLabel.style.color = 'var(--text-secondary)';
+
+        const filterSelect = document.createElement('select');
+        filterSelect.className = 'dropdown-select';
+        filterSelect.style.maxWidth = '220px';
+
+        const filterCount = document.createElement('span');
+        filterCount.style.fontSize = '11px';
+        filterCount.style.color = 'var(--text-muted)';
+
+        filterBar.appendChild(filterLabel);
+        filterBar.appendChild(filterSelect);
+        filterBar.appendChild(filterCount);
+        container.appendChild(filterBar);
+
+        const table = document.createElement('table');
+        table.className = 'dev-table';
+        
+        table.innerHTML = `
+            <thead>
+                <tr>
+                    <th>Component Type</th>
+                    <th>Exact API Name</th>
+                    <th>Details & Params</th>
+                    <th>JSON Payload Example</th>
+                </tr>
+            </thead>
+            <tbody id="devTableBody"></tbody>
+        `;
+        
+        container.appendChild(table);
+        const tbody = table.querySelector('#devTableBody');
+        const typeSet = new Set();
+
+        const createCopyBtn = (textToCopy) => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'Copy';
+            btn.style.marginLeft = '8px';
+            btn.onclick = () => {
+                navigator.clipboard.writeText(textToCopy);
+                btn.textContent = 'Copied!';
+                btn.style.backgroundColor = 'var(--accent-green)';
+                btn.style.color = '#fff';
+                setTimeout(() => { btn.textContent = 'Copy'; btn.style.backgroundColor = ''; btn.style.color = ''; }, 1500);
+            };
+            return btn;
+        };
+
+        const addRow = (typeGroup, name, details, example) => {
+            typeSet.add(typeGroup);
+            const tr = document.createElement('tr');
+            tr.dataset.type = typeGroup;
+            
+            const tdType = document.createElement('td');
+            tdType.textContent = typeGroup;
+            
+            const tdName = document.createElement('td');
+            const nameWrap = document.createElement('div');
+            nameWrap.style.display = 'flex';
+            nameWrap.style.alignItems = 'center';
+            nameWrap.style.justifyContent = 'space-between';
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'dev-name';
+            nameSpan.textContent = name;
+            nameWrap.appendChild(nameSpan);
+            nameWrap.appendChild(createCopyBtn(name));
+            tdName.appendChild(nameWrap);
+            
+            const tdDetails = document.createElement('td');
+            tdDetails.className = 'dev-details';
+            tdDetails.textContent = details || 'No additional parameters needed';
+            
+            const tdExample = document.createElement('td');
+            if (example) {
+                const wrap = document.createElement('div');
+                wrap.style.display = 'flex';
+                wrap.style.alignItems = 'flex-start';
+                wrap.style.justifyContent = 'space-between';
+                wrap.style.gap = '8px';
+                const code = document.createElement('code');
+                code.className = 'dev-code';
+                code.style.flex = '1';
+                code.textContent = example;
+                wrap.appendChild(code);
+                wrap.appendChild(createCopyBtn(example));
+                tdExample.appendChild(wrap);
+            } else {
+                tdExample.textContent = '-';
+            }
+
+            tr.appendChild(tdType);
+            tr.appendChild(tdName);
+            tr.appendChild(tdDetails);
+            tr.appendChild(tdExample);
+            tbody.appendChild(tr);
+        };
+
+        buttons.forEach(i => addRow('Button', i.name, 'Payload: Boolean (true to press, false to release)', JSON.stringify({ action: 'setButton', name: i.name, value: true })));
+        stopButtons.forEach(i => addRow('Stop Button', i.name, 'Action: Toggle Emergency Stop', JSON.stringify({ action: 'toggleStopButton', name: i.name })));
+        switches.forEach(i => addRow('Rotary Switch', i.name, 'Values: Integer from 0 to ' + i.maxState, JSON.stringify({ action: 'setSwitch', name: i.name, value: i.maxState > 0 ? 1 : 0 })));
+        pots.forEach(i => addRow('Potentiometer', i.name, 'Values: Float from ' + i.min.toFixed(2) + ' to ' + i.max.toFixed(2), JSON.stringify({ action: 'setPotentiometer', name: i.name, value: Number(i.max.toFixed(2)) })));
+        joysticks.forEach(i => addRow('Joystick', i.name, 'Payload: JSON {x, y} floats from -1.0 to 1.0', JSON.stringify({ action: 'setJoystick', name: i.name, x: 0.5, y: -0.5 })));
+        presetButtons.forEach(i => addRow('Preset Button', i.name, 'Action: Trigger activation (no extra params needed)', JSON.stringify({ action: 'pressPreset', name: i.name })));
+        multyToggles.forEach(i => addRow('Multy Toggle', i.name, 'Action: Toggle state (no param needed to swap) OR state index', JSON.stringify({ action: 'toggleMultyToggle', name: i.name })));
+        dropdowns.forEach(i => addRow('Dropdown', i.name, 'Values: Integer index 0 to ' + (i.options ? i.options.length - 1 : 0), JSON.stringify({ action: 'setDropdown', name: i.name, value: 0 })));
+        sliders.forEach(i => addRow('Slider', i.name, 'Values: Float from ' + i.min.toFixed(2) + ' to ' + i.max.toFixed(2), JSON.stringify({ action: 'setSlider', name: i.name, value: Number(i.max.toFixed(2)) })));
+        lights.forEach(i => addRow('Status Light (READ-ONLY)', i.name, 'Color: ' + i.color + ' | Modes: On, Off, Strobe, Strobe_Fast, Strobe_Slow', JSON.stringify({ type: 'lightUpdate', name: i.name, color: i.color, mode: 'On' })));
+
+        // Populate filter dropdown from discovered types
+        const allOpt = document.createElement('option');
+        allOpt.value = '';
+        allOpt.textContent = 'All Types (' + tbody.children.length + ')';
+        filterSelect.appendChild(allOpt);
+
+        typeSet.forEach(type => {
+            const count = tbody.querySelectorAll(`tr[data-type="${type}"]`).length;
+            const opt = document.createElement('option');
+            opt.value = type;
+            opt.textContent = type + ' (' + count + ')';
+            filterSelect.appendChild(opt);
+        });
+
+        filterCount.textContent = tbody.children.length + ' components';
+
+        filterSelect.onchange = () => {
+            const selected = filterSelect.value;
+            let visible = 0;
+            Array.from(tbody.children).forEach(tr => {
+                const match = !selected || tr.dataset.type === selected;
+                tr.style.display = match ? '' : 'none';
+                if (match) visible++;
+            });
+            filterCount.textContent = visible + ' of ' + tbody.children.length + ' components';
+        };
     }
 
     function createPanel(id) {
@@ -1178,161 +1572,357 @@
 
     function switchTab(id) {
         currentTab = id;
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+        $tabBar.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        $tabPanels.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
 
         const panel = document.getElementById('panel-' + id);
         if (panel) panel.classList.add('active');
 
-        // Re-highlight tab bar button by index
-        const bar = document.getElementById('tabBar');
-        const panels = document.querySelectorAll('.tab-content');
-        bar.childNodes.forEach((btn, i) => {
-            const panelId = panels[i]?.id?.replace('panel-', '');
+        // Re-highlight matching tab button
+        const allPanels = $tabPanels.querySelectorAll('.tab-content');
+        $tabBar.childNodes.forEach((btn, i) => {
+            const panelId = allPanels[i]?.id?.replace('panel-', '');
             btn.classList.toggle('active', panelId === id);
         });
     }
 
-    // ── Button Cards ────────────────────────────────
-    function renderButtonCards(container, buttons) {
-        const grid = document.createElement('div');
-        grid.className = 'controls-grid';
+    // ── Button Card Creators ────────────────────────────────
+    function createButtonCard(b) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
 
-        buttons.forEach(b => {
-            const card = document.createElement('div');
-            card.className = 'control-card';
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.textContent = b.name;
 
-            const name = document.createElement('div');
-            name.className = 'ctrl-name';
-            name.textContent = b.name;
+        const btn = document.createElement('button');
+        btn.className = 'btn-press';
+        btn.textContent = 'Press';
 
-            const btn = document.createElement('button');
-            btn.className = 'btn-press';
-            btn.textContent = 'Press';
+        let isPressed = false;
 
-            let isPressed = false;
+        const press = () => {
+            if (isPressed) return;
+            isPressed = true;
+            send({ action: 'setButton', name: b.name, value: true });
+            logConsole(`Button <span class="highlight">${b.name}</span> <span class="value-change">PRESSED</span>`);
+        };
 
-            const press = () => {
-                if (isPressed) return;
-                isPressed = true;
-                send({ action: 'setButton', name: b.name, value: true });
-                logConsole(`Button <span class="highlight">${b.name}</span> <span class="value-change">PRESSED</span>`);
-            };
+        const release = () => {
+            if (!isPressed) return;
+            isPressed = false;
+            send({ action: 'setButton', name: b.name, value: false });
+        };
 
-            const release = () => {
-                if (!isPressed) return;
-                isPressed = false;
-                send({ action: 'setButton', name: b.name, value: false });
-            };
+        btn.onmousedown = press;
+        btn.onmouseup = release;
+        btn.onmouseleave = release;
+        btn.addEventListener('touchstart', (e) => { e.preventDefault(); press(); }, { passive: false });
+        btn.addEventListener('touchend', (e) => { e.preventDefault(); release(); }, { passive: false });
+        btn.addEventListener('touchcancel', (e) => { e.preventDefault(); release(); }, { passive: false });
 
-            // Mouse events
-            btn.onmousedown = press;
-            btn.onmouseup = release;
-            btn.onmouseleave = release;
-
-            // Touch events (prevents scroll-triggers if dragging on button)
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); press(); }, { passive: false });
-            btn.addEventListener('touchend', (e) => { e.preventDefault(); release(); }, { passive: false });
-            btn.addEventListener('touchcancel', (e) => { e.preventDefault(); release(); }, { passive: false });
-
-            card.appendChild(name);
-            card.appendChild(btn);
-            grid.appendChild(card);
-        });
-
-        container.appendChild(grid);
+        card.appendChild(name);
+        card.appendChild(btn);
+        return card;
     }
 
-    // ── Stop Button Cards ────────────────────────────
-    function renderStopButtonCards(container, stopButtons) {
-        const grid = document.createElement('div');
-        grid.className = 'controls-grid';
+    // ── Screen Controls Grouping ────────────────────
+    function renderScreenControlsGrouped(panel, presetButtons, multyToggles, dropdowns, sliders) {
+        const groups = {};
+        const addItem = (item, type) => {
+            let normalizedName = item.name.trim();
+            if (normalizedName.startsWith('UI_')) {
+                normalizedName = normalizedName.substring(3);
+            }
+            
+            let prefix = normalizedName.split('_')[0].trim();
+            if (normalizedName.indexOf('_') === -1) prefix = 'Other';
+            
+            // Force presets to always group under 'Presets' regardless of their exact name formulation
+            if (type === 'preset' || prefix === 'Button' || prefix === 'Preset' || prefix === 'Presets') {
+                prefix = 'Presets';
+            } else {
+                // Map known prefixes to English names
+                if (prefix === 'MovingHead') prefix = 'Moving Heads';
+                else if (prefix === 'Effect' || prefix === 'Effects' || prefix === 'Effekte' || prefix === 'Effekt' || prefix === 'Horn' || prefix === 'Hupe') prefix = 'Effects';
+                else if (prefix === 'LED' || prefix === 'LEDs') prefix = 'LEDs';
+                else if (prefix === 'Spotlight' || prefix === 'Spotlights' || prefix === 'Scheinwerfer') prefix = 'Spotlights';
+            }
+            
+            const allowed = ['LEDs', 'Effects', 'Spotlights', 'Moving Heads', 'Presets'];
+            if (!allowed.includes(prefix)) prefix = 'Other/Unknown';
+            
+            if (!groups[prefix]) groups[prefix] = [];
+            groups[prefix].push({ data: item, type: type });
+        };
 
-        stopButtons.forEach(sb => {
-            const card = document.createElement('div');
-            card.className = 'control-card';
-            card.id = 'stopbtn-card-' + sb.name;
+        presetButtons.forEach(i => addItem(i, 'preset'));
+        multyToggles.forEach(i => addItem(i, 'multyToggle'));
+        dropdowns.forEach(i => addItem(i, 'dropdown'));
+        sliders.forEach(i => addItem(i, 'slider'));
 
-            const nameRow = document.createElement('div');
-            nameRow.style.display = 'flex';
-            nameRow.style.alignItems = 'center';
-            nameRow.style.marginBottom = '10px';
+        const preferredOrder = ['LEDs', 'Effects', 'Spotlights', 'Moving Heads', 'Presets'];
 
-            const name = document.createElement('div');
-            name.className = 'ctrl-name';
-            name.style.marginBottom = '0';
-            name.textContent = sb.name;
-
-            const status = document.createElement('span');
-            status.className = 'stop-status ' + (sb.isDown ? 'down' : 'up');
-            status.id = 'stopbtn-status-' + sb.name;
-            status.textContent = sb.isDown ? 'DOWN' : 'UP';
-
-            nameRow.appendChild(name);
-            nameRow.appendChild(status);
-
-            const btn = document.createElement('button');
-            btn.className = 'btn-stop' + (sb.isDown ? ' pressed' : '');
-            btn.id = 'stopbtn-btn-' + sb.name;
-            btn.textContent = sb.isDown ? '⬆ Release' : '⬇ Press Down';
-
-            btn.onclick = () => {
-                send({ action: 'toggleStopButton', name: sb.name });
-                logConsole(`StopButton <span class="highlight">${sb.name}</span> <span class="value-change">TOGGLED</span>`);
-            };
-
-            card.appendChild(nameRow);
-            card.appendChild(btn);
-            grid.appendChild(card);
+        Object.keys(groups).sort((a, b) => {
+            const indexA = preferredOrder.indexOf(a);
+            const indexB = preferredOrder.indexOf(b);
+            if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+            if (indexA !== -1) return -1;
+            if (indexB !== -1) return 1;
+            return a.localeCompare(b);
+        }).forEach(prefix => {
+            const section = document.createElement('div');
+            section.className = 'group-section';
+            section.style.marginBottom = '2rem';
+            
+            const title = document.createElement('div');
+            title.className = 'group-title';
+            title.textContent = prefix;
+            section.appendChild(title);
+            
+            const typeOrder = ['preset', 'multyToggle', 'dropdown', 'slider'];
+            
+            typeOrder.forEach(typeKey => {
+                const typeItems = groups[prefix].filter(obj => obj.type === typeKey);
+                
+                if (typeItems.length > 0) {
+                    const grid = document.createElement('div');
+                    grid.className = 'controls-grid';
+                    grid.style.marginBottom = '1.5rem';
+                    
+                    typeItems.forEach(obj => {
+                        if (obj.type === 'preset') grid.appendChild(createPresetCard(obj.data));
+                        else if (obj.type === 'multyToggle') grid.appendChild(createMultyToggleCard(obj.data));
+                        else if (obj.type === 'dropdown') grid.appendChild(createDropdownCard(obj.data));
+                        else if (obj.type === 'slider') grid.appendChild(createSliderCard(obj.data));
+                    });
+                    
+                    section.appendChild(grid);
+                }
+            });
+            panel.appendChild(section);
         });
+    }
 
-        container.appendChild(grid);
+    // ── Preset Button Cards ─────────────────────────
+    function createPresetCard(pb) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.textContent = pb.name;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-preset';
+        btn.textContent = 'Activate';
+
+        btn.onclick = () => {
+            send({ action: 'pressPreset', name: pb.name });
+            logConsole(`Preset <span class="highlight">${pb.name}</span> <span class="value-change">ACTIVATED</span>`);
+        };
+
+        card.appendChild(name);
+        card.appendChild(btn);
+        return card;
+    }
+
+    // ── Stop Button Card Creator ────────────────────────────
+    function createStopButtonCard(sb) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.textContent = sb.name;
+
+        const btn = document.createElement('button');
+        btn.className = 'btn-stop';
+        btn.textContent = 'Toggle';
+
+        btn.onclick = () => {
+            send({ action: 'toggleStopButton', name: sb.name });
+            logConsole(`StopButton <span class="highlight">${sb.name}</span> <span class="value-change">TOGGLED</span>`);
+        };
+
+        card.appendChild(name); 
+        card.appendChild(btn);
+        return card;
     }
 
     // ── Multy Toggle Cards ────────────────────────────
-    function renderMultyToggleCards(container, multyToggles) {
-        const grid = document.createElement('div');
-        grid.className = 'controls-grid';
+    function createMultyToggleCard(mt) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+        card.id = 'multytoggle-card-' + mt.name;
 
-        multyToggles.forEach(mt => {
-            const card = document.createElement('div');
-            card.className = 'control-card';
-            card.id = 'multytoggle-card-' + mt.name;
+        const nameRow = document.createElement('div');
+        nameRow.style.display = 'flex';
+        nameRow.style.alignItems = 'center';
+        nameRow.style.marginBottom = '10px';
 
-            const nameRow = document.createElement('div');
-            nameRow.style.display = 'flex';
-            nameRow.style.alignItems = 'center';
-            nameRow.style.marginBottom = '10px';
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.style.marginBottom = '0';
+        name.textContent = mt.name;
 
-            const name = document.createElement('div');
-            name.className = 'ctrl-name';
-            name.style.marginBottom = '0';
-            name.textContent = mt.name;
+        const status = document.createElement('span');
+        status.className = 'multy-status ' + (mt.value === 1 ? 'on' : 'off');
+        status.id = 'multytoggle-status-' + mt.name;
+        status.textContent = mt.value === 1 ? 'ON' : 'OFF';
 
-            const status = document.createElement('span');
-            status.className = 'multy-status ' + (mt.value === 1 ? 'on' : 'off');
-            status.id = 'multytoggle-status-' + mt.name;
-            status.textContent = mt.value === 1 ? 'ON' : 'OFF';
+        nameRow.appendChild(name);
+        nameRow.appendChild(status);
 
-            nameRow.appendChild(name);
-            nameRow.appendChild(status);
+        const btn = document.createElement('button');
+        btn.className = 'btn-multytoggle' + (mt.value === 1 ? ' pressed' : '');
+        btn.id = 'multytoggle-btn-' + mt.name;
+        btn.textContent = mt.value === 1 ? 'Set OFF' : 'Set ON';
 
-            const btn = document.createElement('button');
-            btn.className = 'btn-multytoggle' + (mt.value === 1 ? ' pressed' : '');
-            btn.id = 'multytoggle-btn-' + mt.name;
-            btn.textContent = mt.value === 1 ? 'Set OFF' : 'Set ON';
+        btn.onclick = () => {
+            send({ action: 'toggleMultyToggle', name: mt.name });
+            logConsole(`MultyToggle <span class="highlight">${mt.name}</span> <span class="value-change">TOGGLED</span>`);
+        };
 
-            btn.onclick = () => {
-                send({ action: 'toggleMultyToggle', name: mt.name });
-                logConsole(`MultyToggle <span class="highlight">${mt.name}</span> <span class="value-change">TOGGLED</span>`);
-            };
+        card.appendChild(nameRow);
+        card.appendChild(btn);
+        return card;
+    }
 
-            card.appendChild(nameRow);
-            card.appendChild(btn);
-            grid.appendChild(card);
+    function updateMultyToggle(msg) {
+        const btn = document.getElementById('multytoggle-btn-' + msg.name);
+        const status = document.getElementById('multytoggle-status-' + msg.name);
+
+        if (btn) {
+            if (msg.value === 1) {
+                btn.classList.add('pressed');
+                btn.textContent = 'Set OFF';
+            } else {
+                btn.classList.remove('pressed');
+                btn.textContent = 'Set ON';
+            }
+        }
+
+        if (status) {
+            status.className = 'multy-status ' + (msg.value === 1 ? 'on' : 'off');
+            status.textContent = msg.value === 1 ? 'ON' : 'OFF';
+        }
+    }
+
+    // ── Dropdown Cards ────────────────────────────────
+    function createDropdownCard(dd) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+        card.id = 'dropdown-card-' + dd.name;
+
+        const nameRow = document.createElement('div');
+        nameRow.style.display = 'flex';
+        nameRow.style.alignItems = 'center';
+        nameRow.style.marginBottom = '10px';
+
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.style.marginBottom = '0';
+        name.textContent = dd.name;
+
+        const indexBadge = document.createElement('span');
+        indexBadge.className = 'dropdown-index';
+        indexBadge.id = 'dropdown-index-' + dd.name;
+        indexBadge.textContent = dd.selectedIndex;
+
+        nameRow.appendChild(name);
+        nameRow.appendChild(indexBadge);
+
+        const select = document.createElement('select');
+        select.className = 'dropdown-select';
+        select.id = 'dropdown-select-' + dd.name;
+
+        (dd.options || []).forEach((opt, i) => {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = opt || `Option ${i}`;
+            if (i === dd.selectedIndex) option.selected = true;
+            select.appendChild(option);
         });
 
-        container.appendChild(grid);
+        select.onchange = () => {
+            const idx = parseInt(select.value);
+            send({ action: 'setDropdown', name: dd.name, value: idx });
+            const badge = document.getElementById('dropdown-index-' + dd.name);
+            if (badge) badge.textContent = idx;
+            logConsole(`Dropdown <span class="highlight">${dd.name}</span> set to <span class="value-change">${idx}</span>`);
+        };
+
+        card.appendChild(nameRow);
+        card.appendChild(select);
+        return card;
+    }
+
+    function updateDropdown(msg) {
+        const select = document.getElementById('dropdown-select-' + msg.name);
+        const badge = document.getElementById('dropdown-index-' + msg.name);
+
+        if (select) select.value = msg.selectedIndex;
+        if (badge) badge.textContent = msg.selectedIndex;
+    }
+
+    // ── Slider Cards ──────────────────────────────────
+    function createSliderCard(sl) {
+        const card = document.createElement('div');
+        card.className = 'control-card';
+        card.id = 'slider-card-' + sl.name;
+
+        const name = document.createElement('div');
+        name.className = 'ctrl-name';
+        name.textContent = sl.name;
+
+        const row = document.createElement('div');
+        row.className = 'pot-slider-row';
+
+        const input = document.createElement('input');
+        input.type = 'range';
+        input.min = sl.min;
+        input.max = sl.max;
+        input.step = 'any';
+        input.value = sl.current;
+        input.id = 'slider-input-' + sl.name;
+
+        const val = document.createElement('div');
+        val.className = 'pot-value';
+        val.id = 'slider-val-' + sl.name;
+        val.textContent = sl.current.toFixed(2);
+
+        input.onchange = () => {
+            const num = parseFloat(input.value);
+            send({ action: 'setSlider', name: sl.name, value: num });
+            logConsole(`Slider <span class="highlight">${sl.name}</span> <span class="value-change">SET TO ${num.toFixed(2)}</span>`);
+        };
+
+        input.oninput = () => {
+            val.textContent = parseFloat(input.value).toFixed(2);
+        };
+
+        row.appendChild(input);
+        row.appendChild(val);
+
+        const limits = document.createElement('div');
+        limits.className = 'pot-range';
+        const limMin = document.createElement('span'); limMin.textContent = sl.min.toFixed(2);
+        const limMax = document.createElement('span'); limMax.textContent = sl.max.toFixed(2);
+        limits.appendChild(limMin);
+        limits.appendChild(limMax);
+
+        card.appendChild(name);
+        card.appendChild(row);
+        card.appendChild(limits);
+        return card;
+    }
+
+    function updateSlider(msg) {
+        const input = document.getElementById('slider-input-' + msg.name);
+        const val = document.getElementById('slider-val-' + msg.name);
+        if (input) input.value = msg.value;
+        if (val) val.textContent = msg.value.toFixed(2);
     }
 
     // ── Switch Cards ────────────────────────────────
