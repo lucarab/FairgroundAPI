@@ -104,7 +104,8 @@ namespace FairgroundAPI.Network
                 switches = BuildSwitchData(),
                 potentiometers = BuildPotentiometerData(),
                 joysticks = BuildJoystickData(),
-                stopButtons = BuildStopButtonData()
+                stopButtons = BuildStopButtonData(),
+                multyToggles = BuildMultyToggleData()
             };
 
             Broadcast(ToJson(msg));
@@ -129,19 +130,6 @@ namespace FairgroundAPI.Network
         public static void BroadcastSessionLost()
         {
             Broadcast(ToJson(new SessionMessage { type = "session", active = false }));
-        }
-
-        /// <summary>Broadcasts a stop button state change to all clients.</summary>
-        public static void BroadcastStopButtonUpdate(string name, bool isDown)
-        {
-            var msg = new StopButtonUpdateMessage
-            {
-                type = "stopButtonUpdate",
-                name = name,
-                isDown = isDown
-            };
-
-            Broadcast(ToJson(msg));
         }
 
         /// <summary>
@@ -189,6 +177,11 @@ namespace FairgroundAPI.Network
                     case "toggleStopButton":
                         var sbCmd = FromJson<IncomingCommand>(data);
                         InteractionManager.ToggleStopButton(sbCmd.name);
+                        break;
+
+                    case "toggleMultyToggle":
+                        var mtCmd = FromJson<IncomingCommand>(data);
+                        InteractionManager.ToggleMultyToggle(mtCmd.name);
                         break;
 
                     default:
@@ -298,6 +291,23 @@ namespace FairgroundAPI.Network
                 {
                     name = kvp.Key,
                     isDown = sb.Is_Down
+                });
+            }
+            return list.ToArray();
+        }
+
+        private static MultyToggleData[] BuildMultyToggleData()
+        {
+            var list = new List<MultyToggleData>();
+            foreach (var kvp in SessionManager.TrackedMultyToggles)
+            {
+                var mt = kvp.Value;
+                if (mt.WasCollected) continue;
+
+                list.Add(new MultyToggleData
+                {
+                    name = kvp.Key,
+                    value = mt.Value
                 });
             }
             return list.ToArray();

@@ -16,7 +16,6 @@ namespace FairgroundAPI.Components
         public MainLoopComponent(System.IntPtr ptr) : base(ptr) { }
 
         private readonly Dictionary<int, string> _lastKnownModes = new();
-        private readonly Dictionary<string, bool> _lastKnownStopButtonStates = new();
         private const float PollInterval = 0.25f;
         private float _timer;
 
@@ -41,14 +40,12 @@ namespace FairgroundAPI.Components
         public void ClearCache()
         {
             _lastKnownModes.Clear();
-            _lastKnownStopButtonStates.Clear();
         }
 
         private void Update()
         {
             ProcessQueue();
             PollLights();
-            PollStopButtons();
         }
 
         private void ProcessQueue()
@@ -101,37 +98,6 @@ namespace FairgroundAPI.Components
         {
             string color = MaterialHelper.ExtractColorName(light);
             WebSocketManager.BroadcastLightUpdate(id, light.gameObject.name, color, mode);
-        }
-
-        /// <summary>
-        /// Checks all tracked stop buttons for state changes at the same poll interval
-        /// and broadcasts updates to connected clients.
-        /// </summary>
-        private void PollStopButtons()
-        {
-            if (!SessionManager.HasActiveSession) return;
-
-            // Uses the same _timer as PollLights — they share the interval
-            var snapshot = new List<KeyValuePair<string, Stop_Button>>(SessionManager.TrackedStopButtons);
-
-            foreach (var kvp in snapshot)
-            {
-                Stop_Button sb = kvp.Value;
-                if (sb.WasCollected) continue;
-
-                bool currentState = sb.Is_Down;
-
-                if (!_lastKnownStopButtonStates.TryGetValue(kvp.Key, out bool lastState))
-                {
-                    _lastKnownStopButtonStates[kvp.Key] = currentState;
-                    WebSocketManager.BroadcastStopButtonUpdate(kvp.Key, currentState);
-                }
-                else if (lastState != currentState)
-                {
-                    _lastKnownStopButtonStates[kvp.Key] = currentState;
-                    WebSocketManager.BroadcastStopButtonUpdate(kvp.Key, currentState);
-                }
-            }
         }
     }
 }

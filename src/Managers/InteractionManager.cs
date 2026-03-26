@@ -112,6 +112,24 @@ namespace FairgroundAPI.Managers
             Log.LogDebug($"[Command] StopButton TOGGLED -> {name} (Is_Down: {stopButton.Is_Down})");
         }
 
+        /// <summary>Toggles a multy toggle.</summary>
+        public static void ToggleMultyToggle(string name)
+        {
+            if (!EnsureReady()) return;
+
+            if (!SessionManager.TrackedMultyToggles.TryGetValue(name, out Multy_Toggle multyToggle))
+            {
+                Log.LogWarning($"MultyToggle '{name}' not found on this console.");
+                return;
+            }
+
+            if (multyToggle.WasCollected) return;
+
+            MethodResolver.InvokeMultyToggleState(multyToggle);
+            // Current value is typically 1 (on) or 0 (off), though the invoke toggles it
+            Log.LogDebug($"[Command] MultyToggle TOGGLED -> {name} (Value: {multyToggle.Value})");
+        }
+
         private static bool EnsureReady()
         {
             if (!SessionManager.HasActiveSession)

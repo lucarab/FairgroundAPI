@@ -21,6 +21,7 @@ namespace FairgroundAPI.Utilities
         private static readonly Dictionary<Type, MethodInfo> _applyCache = new();
 
         private static MethodInfo _stopButtonToggleMethod;
+        private static MethodInfo _multyToggleSetStateMethod;
 
         public static bool IsResolved { get; private set; }
 
@@ -33,8 +34,9 @@ namespace FairgroundAPI.Utilities
 
             bool applyOk = ResolveApplyValue();
             bool stopBtnOk = ResolveStopButtonToggle();
+            bool multyToggleOk = ResolveMultyToggleState();
 
-            IsResolved = applyOk && stopBtnOk;
+            IsResolved = applyOk && stopBtnOk && multyToggleOk;
 
             Log.LogInfo(IsResolved
                 ? "[Resolver] All methods resolved successfully."
@@ -198,6 +200,47 @@ namespace FairgroundAPI.Utilities
             }
 
             _stopButtonToggleMethod.Invoke(stopButton, null);
+        }
+
+        /// <summary>
+        /// Resolves the toggle method on Multy_Toggle.
+        /// Searches for a void instance method that takes exactly two boolean parameters.
+        /// </summary>
+        private static bool ResolveMultyToggleState()
+        {
+            var candidates = typeof(Multy_Toggle)
+                .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+
+            foreach (var method in candidates)
+            {
+                if (method.ReturnType != typeof(void)) continue;
+                
+                var parameters = method.GetParameters();
+                if (parameters.Length != 2) continue;
+                if (parameters[0].ParameterType != typeof(bool)) continue;
+                if (parameters[1].ParameterType != typeof(bool)) continue;
+                if (method.IsSpecialName) continue; // skip property accessors
+
+                _multyToggleSetStateMethod = method;
+                Log.LogDebug($"[Resolver] MultyToggle SetState -> '{method.Name}'");
+                return true;
+            }
+
+            Log.LogWarning("[Resolver] Could not find SetState method on Multy_Toggle. MultyToggle support disabled.");
+            return false;
+        }
+
+        /// <summary>Invokes the resolved toggle method on a Multy_Toggle instance.</summary>
+        public static void InvokeMultyToggleState(Multy_Toggle multyToggle)
+        {
+            if (_multyToggleSetStateMethod == null)
+            {
+                Log.LogError("[Resolver] MultyToggle SetState method not resolved.");
+                return;
+            }
+
+            // We can just pass false, false since the game just toggles the position
+            _multyToggleSetStateMethod.Invoke(multyToggle, new object[] { false, false });
         }
     }
 }
