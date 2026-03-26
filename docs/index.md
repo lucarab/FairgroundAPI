@@ -47,6 +47,11 @@ We have fully documented the entire WebSocket interface (JSON payloads in and ou
 
 👉 **[Read the API Documentation here](https://lucarab.github.io/FairgroundAPI/API.html)**
 
+## 🤝 Contributing & Issues
+
+Found a bug or have a feature request? Please [open an issue](https://github.com/lucarab/FairgroundAPI/issues) on GitHub.
+Pull requests are also highly welcome! If you want to contribute to the project, feel free to fork the repository, make your changes, and submit a PR.
+
 ## 💬 Support & Feedback
 
 If you have any questions, encounter bugs, or need help implementing the API, feel free to reach out.
